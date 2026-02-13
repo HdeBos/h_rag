@@ -1,0 +1,29 @@
+name: dev pipeline
+on: push
+
+jobs:
+  uv-example:
+    name: python
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "0.10.2"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: "pyproject.toml"
+
+      - name: Run Ruff
+        run: uv run ruff check --output-format=github .
+
+      - name: Run unit tests
+        run: uv run coverage run --source=src -m pytest tests/unit_tests
+      
+      - name: Generate coverage reports
+        run: uv run coverage report
