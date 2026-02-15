@@ -1,8 +1,12 @@
-logs/
-.mypy_cache/
+__pycache__/
+
+.chroma/
 .pytest_cache/
 .ruff_cache/
-__pycache__/
 .venv/
+
+logs/
+file_storage/
+
 .env
 .coverage

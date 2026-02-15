@@ -1,5 +1,6 @@
 """Module for the LLM Factory."""
 
+from h_rag.config.config_wrapper import get_config
 from h_rag.llm.gemini_wrapper import GeminiWrapper
 from h_rag.llm.llm import LLM
 from h_rag.llm.ollama_wrapper import OllamaWrapper
@@ -14,8 +15,9 @@ class LLMFactory:
     }
 
     @classmethod
-    def get_llm(cls, provider: str) -> LLM:
+    def get_llm(cls) -> LLM:
         """Factory Method."""
+        provider = get_config("llm", "provider")
         try:
             return cls._llm_providers[provider]()
         except KeyError:

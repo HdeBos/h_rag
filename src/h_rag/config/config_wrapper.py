@@ -18,17 +18,20 @@ class ConfigWrapper:
         with path.open("r") as f:
             return yaml.safe_load(f)
 
-    def get(self, key: str) -> str:
+    def get(self, section: str, key: str) -> str:
         """Get a configuration value."""
-        value = self.config.get(key)
+        top_config = self.config.get(section)
+        if not top_config:
+            raise ValueError(f"Configuration section {section} not found")
+        value = top_config.get(key)
         if not value:
-            raise ValueError(f"Configuration value for {key} not found")
+            raise ValueError(f"Configuration value for {key} not found within section {section}")
         return value
 
 
 _CONFIG = ConfigWrapper()
 
 
-def get_config(key: str) -> str:
+def get_config(section: str, key: str) -> str:
     """Get a configuration value."""
-    return _CONFIG.get(key)
+    return _CONFIG.get(section, key)

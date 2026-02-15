@@ -16,6 +16,6 @@ def load_env():
 def initialize_logger():
     """Initialize logger."""
     logger.remove()
-    logger.add(sys.stdout, level=get_config("loguru_level"))
+    logger.add(sys.stdout, level=get_config("logger", "loguru_level"))
     logger.add("logs/info.log", level="INFO", rotation="10 MB")
     logger.add("logs/debug.log", level="DEBUG", rotation="10 MB")

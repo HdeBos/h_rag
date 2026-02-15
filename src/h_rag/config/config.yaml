@@ -1,3 +1,16 @@
-loguru_level: "INFO"
+logger:
+  loguru_level: "INFO"
 
-llm_provider: "Ollama" # Options: "Ollama", "Gemini"
+llm:
+  provider: "Ollama" # Options: "Ollama", "Gemini"
+
+chunking:
+  method: "FixedSize" # Options: "FixedSize"
+  size: 400
+  overlap: 60
+
+vector_db:
+  provider: "Chroma" # Options: "Chroma"
+
+run:
+  workflow: "Default" # Options: "Default"
