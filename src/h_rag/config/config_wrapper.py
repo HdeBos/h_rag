@@ -18,20 +18,29 @@ class ConfigWrapper:
         with path.open("r") as f:
             return yaml.safe_load(f)
 
-    def get(self, section: str, key: str) -> str:
-        """Get a configuration value."""
-        top_config = self.config.get(section)
-        if not top_config:
-            raise ValueError(f"Configuration section {section} not found")
-        value = top_config.get(key)
-        if not value:
-            raise ValueError(f"Configuration value for {key} not found within section {section}")
-        return value
+    def get(self, *keys: str) -> str:
+        """Get a configuration value by traversing nested keys.
+
+        Supports arbitrary depth, e.g. get("chunking", "semantic", "threshold_percentile").
+        """
+        if not keys:
+            raise ValueError("At least one key must be provided")
+        current: dict | str = self.config
+        for key in keys:
+            if not isinstance(current, dict):
+                raise ValueError(f"Cannot traverse into non-dict value at key '{key}'")
+            value = current.get(key)
+            if value is None:
+                raise ValueError(f"Configuration key '{key}' not found")
+            current = value
+        if isinstance(current, dict):
+            raise ValueError(f"Configuration value at keys {keys} is not a string")
+        return current
 
 
 _CONFIG = ConfigWrapper()
 
 
-def get_config(section: str, key: str) -> str:
-    """Get a configuration value."""
-    return _CONFIG.get(section, key)
+def get_config(*keys: str) -> str:
+    """Get a configuration value by traversing nested keys."""
+    return _CONFIG.get(*keys)

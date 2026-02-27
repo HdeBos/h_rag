@@ -2,6 +2,7 @@
 
 from h_rag.chunking.chunking import Chunking
 from h_rag.chunking.fixed_size_chunking import FixedSizeChunking
+from h_rag.chunking.semantic_chunking import SemanticChunking
 from h_rag.config.config_wrapper import get_config
 
 
@@ -10,9 +11,9 @@ class ChunkingFactory:
 
     _chunking_methods = {
         "FixedSize": FixedSizeChunking,
+        "Semantic": SemanticChunking,
         # POSSIBLE FUTURE METHODS:
         # Recursive / Hierarchical Chunking
-        # "Semantic": SemanticChunking,
         # Contextual / Query-Aware Chunking (Dynamic Chunking)
         # Graph-Based / Knowledge-Aware Chunking
     }

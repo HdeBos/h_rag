@@ -10,11 +10,15 @@ requires-python = "==3.13.12"
 dependencies = [
     "chromadb>=1.5.0",
     "dotenv>=0.9.9",
+    "einops>=0.8.2",
+    "en-core-web-sm",
     "google-genai>=1.63.0",
     "loguru>=0.7.3",
     "ollama>=0.6.1",
     "pymupdf>=1.27.1",
     "pyyaml>=6.0.3",
+    "sentence-transformers>=5.2.3",
+    "spacy>=3.8.11",
     "streamlit>=1.54.0",
 ]
 
@@ -50,3 +54,6 @@ line-ending = "lf"
 
 [tool.mypy]
 mypy_path = ["src"]
+
+[tool.uv.sources]
+en-core-web-sm = { url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl" }

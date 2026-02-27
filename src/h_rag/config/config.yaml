@@ -5,12 +5,16 @@ llm:
   provider: "Ollama" # Options: "Ollama", "Gemini"
 
 chunking:
-  method: "FixedSize" # Options: "FixedSize"
-  size: 400
-  overlap: 60
+  method: "Semantic" # Options: "FixedSize", "Semantic"
+  fixed_size:
+    size: 400
+    overlap: 60
+  semantic:
+    threshold_percentile: 70
 
 vector_db:
   provider: "Chroma" # Options: "Chroma"
+  embedding_model: "nomic-ai/nomic-embed-text-v1.5"
 
 run:
   workflow: "Default" # Options: "Default"

@@ -15,7 +15,7 @@ class FixedSizeChunking(Chunking):
         Returns:
             int: The number of characters in each chunk.
         """
-        return int(get_config("chunking", "size"))
+        return int(get_config("chunking", "fixed_size", "size"))
 
     def _get_overlap(self) -> int:
         """Get the overlap size from the configuration.
@@ -23,7 +23,7 @@ class FixedSizeChunking(Chunking):
         Returns:
             int: The number of characters to overlap between chunks.
         """
-        return int(get_config("chunking", "overlap"))
+        return int(get_config("chunking", "fixed_size", "overlap"))
 
     @override
     def chunk(self, text: str) -> list[str]:

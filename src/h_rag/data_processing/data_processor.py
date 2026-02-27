@@ -3,6 +3,7 @@
 from pathlib import Path
 
 import fitz
+from loguru import logger
 from streamlit.runtime.uploaded_file_manager import UploadedFile
 
 from h_rag.chunking.chunking_factory import ChunkingFactory
@@ -35,6 +36,9 @@ class DataProcessor:
         vector_db = VectorDBFactory.get_vector_db()
         vector_db.create(file_data.name)
         vector_db.insert(name=file_data.name, chunks=file_data.chunks)
+        logger.info(
+            f"Stored {file_data.name} with {len(file_data.chunks)} chunks in vector database"
+        )
 
     def store_file(self, file: UploadedFile) -> None:
         """Store uploaded files in file_storage."""
@@ -45,6 +49,7 @@ class DataProcessor:
         data_bytes = file.getvalue()
         with open(dest, "wb") as out:
             out.write(data_bytes)
+        logger.info(f"Stored file {file.name} in file_storage")
 
     def extract_text(self, data: bytes, file_type: str) -> str:
         """Extract text from a file."""

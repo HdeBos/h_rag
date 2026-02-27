@@ -4,6 +4,21 @@ import streamlit as st
 
 from h_rag.data_processing.data_processor import DataProcessor
 from h_rag.streamlit.menu import menu
+from h_rag.vector_db.vector_db_factory import VectorDBFactory
+
+
+def get_knowledge_bases() -> None:
+    """Get the knowledge base from the vector database."""
+    if "knowledge_bases" not in st.session_state:
+        vector_db = VectorDBFactory.get_vector_db()
+        st.session_state.knowledge_bases = vector_db.get_knowledge_bases()
+
+
+def delete_knowledge_base(knowledge_base: str):
+    """Delete the selected knowledge base."""
+    vector_db = VectorDBFactory.get_vector_db()
+    vector_db.delete(knowledge_base)
+    st.success(f"Deleted knowledge base: {knowledge_base}")
 
 
 def init():
@@ -33,3 +48,8 @@ if __name__ == "__main__":
     )
 
     st.button("Process Uploaded Files", on_click=process_files, args=(uploaded_files,))
+    get_knowledge_bases()
+    knowledge_base = st.selectbox(
+        "Knowledge base to delete", options=st.session_state.knowledge_bases
+    )
+    st.button("Delete Knowledge Base", on_click=delete_knowledge_base, args=(knowledge_base,))

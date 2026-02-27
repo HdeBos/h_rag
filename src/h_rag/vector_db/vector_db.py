@@ -1,12 +1,27 @@
 """Abstract base class for vector databases."""
 
 from abc import ABC, abstractmethod
+from functools import lru_cache
 
+import numpy as np
+from sentence_transformers import SentenceTransformer
+
+from h_rag.config.config_wrapper import get_config
 from h_rag.models.vector_search_result import VectorSearchResult
+
+
+@lru_cache(maxsize=1)
+def _load_embedding_model(model_name: str) -> SentenceTransformer:
+    return SentenceTransformer(model_name, trust_remote_code=True)
 
 
 class VectorDB(ABC):
     """Abstract base class for vector databases."""
+
+    def __init__(self) -> None:
+        """Initialize the vector database."""
+        model_name = get_config("vector_db", "embedding_model")
+        self.embedding_model = _load_embedding_model(model_name)
 
     @abstractmethod
     def create(self, name: str) -> None:
@@ -14,6 +29,15 @@ class VectorDB(ABC):
 
         Args:
             name: The name of the knowledge base to create.
+        """
+        pass
+
+    @abstractmethod
+    def delete(self, name: str) -> None:
+        """Delete a knowledge base.
+
+        Args:
+            name: The name of the knowledge base to delete.
         """
         pass
 
@@ -47,5 +71,18 @@ class VectorDB(ABC):
 
         Returns:
             A list of all knowledge bases.
+        """
+        pass
+
+    @abstractmethod
+    def encode(self, text: str | list[str], type: str | None = None) -> np.ndarray:
+        """Encode a string or a list of strings into vectors.
+
+        Args:
+            text: The string or list of strings to encode.
+            type: The type of encoding, either None, "document" or "query".
+
+        Returns:
+            A numpy ndarray representing the encoded vector(s).
         """
         pass
