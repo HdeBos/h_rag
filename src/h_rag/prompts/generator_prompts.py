@@ -7,6 +7,7 @@ Given the following query and chunks of relevant information,
 generate a concise and informative response.
 
 If the information is insufficient to answer the query, say you don't know.
+Use only the information provided in the chunks to answer the query.
 
 Query: ${query}
 Chunks: ${chunks}

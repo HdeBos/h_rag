@@ -1,0 +1,14 @@
+services:
+  garage:
+    image: dxflrs/garage:v2.2.0
+    container_name: garage
+    restart: unless-stopped
+    ports:
+      - "3900:3900"   # S3 API
+      - "3901:3901"   # RPC (internal cluster comms)
+      - "3902:3902"   # S3 Web UI
+    environment:
+      - GARAGE_RPC_SECRET=${GARAGE_RPC_SECRET}
+    volumes:
+      - ./.garage/garage.toml:/etc/garage.toml
+      - ./.garage/data:/var/lib/garage

@@ -1,12 +1,12 @@
 __pycache__/
 
 .chroma/
+.garage/
 .pytest_cache/
 .ruff_cache/
 .venv/
 
 logs/
-file_storage/
 
-.env
 .coverage
+.env
