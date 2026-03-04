@@ -12,6 +12,9 @@ chunking:
   semantic:
     threshold_percentile: 70
 
+object_storage:
+  provider: "Garage" # Options: "Garage"
+
 vector_db:
   provider: "Chroma" # Options: "Chroma"
   embedding_model: "nomic-ai/nomic-embed-text-v1.5"

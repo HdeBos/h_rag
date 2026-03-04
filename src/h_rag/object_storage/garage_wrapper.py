@@ -19,8 +19,18 @@ class GarageWrapper(ObjectStorage):
             endpoint_url="http://localhost:3900",
             aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID", ""),
             aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY", ""),
+            region_name=os.getenv("AWS_REGION", ""),
         )
-        self.bucket_name = "hrag-bucket"
+        self.bucket_name = os.getenv("BUCKET_NAME", "")
+
+    @override
+    def health_check(self) -> bool:
+        try:
+            self.s3.list_buckets()
+            return True
+        except Exception as e:
+            logger.error(f"Garage health check failed: {e}")
+            return False
 
     @override
     def upload_file(self, file_data: bytes, file_name: str) -> None:

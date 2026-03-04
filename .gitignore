@@ -2,6 +2,7 @@ __pycache__/
 
 .chroma/
 .garage/
+.github/instructions/
 .pytest_cache/
 .ruff_cache/
 .venv/

@@ -6,7 +6,7 @@ from streamlit.runtime.uploaded_file_manager import UploadedFile
 
 from h_rag.chunking.chunking_factory import ChunkingFactory
 from h_rag.models.document_data import DocumentData
-from h_rag.object_storage.garage_wrapper import GarageWrapper
+from h_rag.object_storage.object_storage_factory import ObjectStorageFactory
 from h_rag.vector_db.vector_db_factory import VectorDBFactory
 
 
@@ -41,7 +41,8 @@ class DataProcessor:
 
     def store_file(self, file: UploadedFile) -> None:
         """Store uploaded files in object storage."""
-        GarageWrapper().upload_file(file_data=file.getvalue(), file_name=file.name)
+        object_storage = ObjectStorageFactory.get_object_storage()
+        object_storage.upload_file(file_data=file.getvalue(), file_name=file.name)
 
     def extract_text(self, data: bytes, file_type: str) -> str:
         """Extract text from a file."""

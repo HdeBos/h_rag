@@ -7,6 +7,11 @@ class ObjectStorage(ABC):
     """Abstract base class for object storage."""
 
     @abstractmethod
+    def health_check(self) -> bool:
+        """Check if the object storage can be reached."""
+        pass
+
+    @abstractmethod
     def upload_file(self, file_data: bytes, file_name: str) -> None:
         """Upload a file to Garage object storage.
 

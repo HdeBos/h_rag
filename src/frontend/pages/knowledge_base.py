@@ -2,9 +2,9 @@
 
 import streamlit as st
 
+from frontend.menu import menu
 from h_rag.data_processing.data_processor import DataProcessor
-from h_rag.object_storage.garage_wrapper import GarageWrapper
-from h_rag.streamlit.menu import menu
+from h_rag.object_storage.object_storage_factory import ObjectStorageFactory
 from h_rag.vector_db.vector_db_factory import VectorDBFactory
 
 
@@ -19,8 +19,8 @@ def delete_knowledge_base(knowledge_base: str):
     """Delete the selected knowledge base."""
     vector_db = VectorDBFactory.get_vector_db()
     vector_db.delete(knowledge_base)
-    garage_wrapper = GarageWrapper()
-    garage_wrapper.delete_file(knowledge_base)
+    object_storage = ObjectStorageFactory.get_object_storage()
+    object_storage.delete_file(knowledge_base)
     st.success(f"Deleted knowledge base: {knowledge_base}")
 
 

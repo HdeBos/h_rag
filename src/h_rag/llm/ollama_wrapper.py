@@ -16,6 +16,15 @@ class OllamaWrapper(LLM):
         self.chat_history: list[dict[str, str]] = []
 
     @override
+    def health_check(self) -> bool:
+        try:
+            ollama.list()
+            return True
+        except Exception as e:
+            logger.error(f"Ollama health check failed: {e}")
+            return False
+
+    @override
     def get_models(self) -> list[str]:
         client = ollama.Client()
         models_info = client.list()

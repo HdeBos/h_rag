@@ -61,6 +61,6 @@ class ChromaWrapper(VectorDB):
         embeddings = self.embedding_model.encode(text)
         return np.asarray(embeddings, dtype=float)
 
+    @override
     def cosine_similarity(self, vec1: np.ndarray, vec2: np.ndarray) -> float:
-        """Calculate cosine similarity between two vectors."""
         return np.dot(vec1, vec2) / (np.linalg.norm(vec1) * np.linalg.norm(vec2))

@@ -7,6 +7,11 @@ class LLM(ABC):
     """Abstract base class for interacting with LLMs."""
 
     @abstractmethod
+    def health_check(self) -> bool:
+        """Check if the LLM can be reached."""
+        pass
+
+    @abstractmethod
     def get_models(self) -> list[str]:
         """Get a list of available models.
 

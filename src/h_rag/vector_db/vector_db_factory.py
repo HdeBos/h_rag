@@ -2,6 +2,7 @@
 
 from h_rag.config.config_wrapper import get_config
 from h_rag.vector_db.chroma_wrapper import ChromaWrapper
+from h_rag.vector_db.vector_db import VectorDB
 
 
 class VectorDBFactory:
@@ -16,7 +17,7 @@ class VectorDBFactory:
     }
 
     @classmethod
-    def get_vector_db(cls) -> ChromaWrapper:
+    def get_vector_db(cls) -> VectorDB:
         """Factory Method."""
         method = get_config("vector_db", "provider")
         try:

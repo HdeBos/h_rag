@@ -16,6 +16,16 @@ class GeminiWrapper(LLM):
         self.chat_history = []
 
     @override
+    def health_check(self) -> bool:
+        try:
+            client = genai.Client()
+            client.models.list()
+            return True
+        except Exception as e:
+            logger.error(f"Gemini health check failed: {e}")
+            return False
+
+    @override
     def get_models(self) -> list[str]:
         client = genai.Client()
         model_info = client.models.list()

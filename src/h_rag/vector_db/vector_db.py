@@ -86,3 +86,16 @@ class VectorDB(ABC):
             A numpy ndarray representing the encoded vector(s).
         """
         pass
+
+    @abstractmethod
+    def cosine_similarity(self, vec1: np.ndarray, vec2: np.ndarray) -> float:
+        """Calculate cosine similarity between two vectors.
+
+        Args:
+            vec1: The first vector.
+            vec2: The second vector.
+
+        Returns:
+            The cosine similarity between the two vectors.
+        """
+        pass
