@@ -3,6 +3,7 @@ __pycache__/
 .chroma/
 .garage/
 .github/instructions/
+.ollama/
 .pytest_cache/
 .ruff_cache/
 .venv/
@@ -11,3 +12,5 @@ logs/
 
 .coverage
 .env
+
+backlog.md

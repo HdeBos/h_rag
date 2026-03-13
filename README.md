@@ -9,13 +9,21 @@ Some RAG/GenAI related stuff.
 
 ## Running the application
 
-`uv run fastapi dev src\backend\backend\api\main.py`
-`uv run streamlit run src\backend\frontend\chat.py`
+`docker compose up --watch`
 
 ## Setup
 
+### Environment variables
 Run `env_example cp .env`  
 Replace relevant variables within `.env`
+
+Within the `backend` folder,
+Run `env_example cp .env`  
+Replace relevant variables within `.env`
+
+### Ollama setup
+
+Install a model in the ollama container using `docker exec -it ollama ollama pull model_name>`, when the ollama container is up and running.
 
 ### Garage setup
 

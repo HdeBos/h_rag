@@ -1,0 +1,7 @@
+GEMINI_API_KEY = "YOUR_GEMINI_API_KEY"
+
+# GARAGE OBJECT STORAGE
+AWS_ACCESS_KEY_ID = "Your Key ID"
+AWS_SECRET_ACCESS_KEY = "Your Secret key"
+AWS_REGION = "garage"
+BUCKET_NAME = "Your bucket name"

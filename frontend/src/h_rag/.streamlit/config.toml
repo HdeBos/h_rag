@@ -1,0 +1,10 @@
+[client]
+showSidebarNavigation = false
+
+[server]
+# Essential for Docker on Windows to detect file changes
+fileWatcherType = "poll"
+runOnSave = true
+
+[browser]
+gatherUsageStats = false

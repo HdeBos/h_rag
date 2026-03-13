@@ -1,0 +1,41 @@
+[build-system]
+requires = ["uv_build==0.7.19"]
+build-backend = "uv_build"
+
+[project]
+name = "h_rag"
+version = "0.1"
+readme = "README.md"
+requires-python = "==3.13.12"
+dependencies = ["streamlit>=1.55.0"]
+
+[dependency-groups]
+dev = ["ruff==0.15.1"]
+
+[tool.pytest.ini_options]
+addopts = ["--import-mode=importlib"]
+testpaths = []
+
+[tool.ruff]
+include = ["src/**.py"]
+exclude = ["src/**/__init__.py"]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["D", "F401", "I"]
+ignore = ["D107"]
+
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+
+[tool.ruf.format]
+docstring-code-format = true
+line-ending = "lf"
+
+[tool.mypy]
+mypy_path = ["src"]
+
+[tool.uv.sources]
+en-core-web-sm = { url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl" }
