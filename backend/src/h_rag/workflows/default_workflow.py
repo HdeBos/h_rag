@@ -4,6 +4,7 @@ from typing import override
 
 from h_rag.agents.generator_agent import GeneratorAgent
 from h_rag.agents.retriever_agent import RetrieverAgent
+from h_rag.models.chat_response import ChatResponse
 from h_rag.workflows.workflow import Workflow
 
 
@@ -16,16 +17,15 @@ class DefaultWorkflow(Workflow):
         self.generator_agent = GeneratorAgent(model)
 
     @override
-    def execute(self, query: str) -> str:
+    def execute(self, query: str) -> ChatResponse:
         """Execute the workflow on the given query.
 
         Args:
             query (str): The query to be processed.
 
         Returns:
-            str: The result of the workflow execution.
+            ChatResponse: The result of the workflow execution.
         """
         records = self.retriever_agent.retrieve(query)
-        chunks = self.retriever_agent.get_chunks(records)
-        response = self.generator_agent.generate(query, chunks)
+        response = self.generator_agent.generate(query, records)
         return response

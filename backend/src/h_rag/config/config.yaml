@@ -17,7 +17,9 @@ object_storage:
 
 vector_db:
   provider: "Chroma" # Options: "Chroma"
-  embedding_model: "nomic-ai/nomic-embed-text-v1.5"
+  embedding_model:
+    name: "nomic-ai/nomic-embed-text-v1.5" # Options: "nomic-ai/nomic-embed-text-v1.5", "all-MiniLM-L6-v2"
+    revision: "e5cf08a" # Options (matchine name above): "e5cf08a", "c9745ed"
 
 run:
   workflow: "Default" # Options: "Default"

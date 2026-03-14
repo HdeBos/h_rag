@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends
 
 from h_rag.models.chat_query import ChatQuery
 from h_rag.services.chat import ChatService
+from src.h_rag.models.chat_response import ChatResponse
 
 router = APIRouter(
     prefix="/chat",
@@ -30,7 +31,7 @@ def get_models(service: Annotated[ChatService, Depends(ChatService)]) -> list[st
 def query(
     service: Annotated[ChatService, Depends(ChatService)],
     chat_query: ChatQuery,
-) -> str:
+) -> ChatResponse:
     """Endpoint to handle chat queries.
 
     Args:
@@ -40,4 +41,4 @@ def query(
     Returns:
         The response from the LLM.
     """
-    return service.query(chat_query.query, chat_query.model, chat_query.knowledge_base)
+    return service.query(chat_query)

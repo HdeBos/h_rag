@@ -23,7 +23,7 @@ app = FastAPI(title="HRAG API", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://frontend:8501"],  # Streamlit default
+    allow_origins=["http://frontend:8501"],  # Streamlit frontend URL
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

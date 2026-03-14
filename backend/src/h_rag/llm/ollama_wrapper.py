@@ -34,7 +34,7 @@ class OllamaWrapper(LLM):
 
     @override
     def query(self, model: str, prompt: str) -> str:
-        logger.info(f"Querying {model} with question: {prompt}")
+        logger.debug(f"Querying {model} with question: {prompt}")
         response = self.client.chat(
             model=model,
             messages=self.chat_history + [{"role": "user", "content": prompt}],

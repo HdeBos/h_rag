@@ -14,17 +14,6 @@ class RetrieverAgent:
         self.vector_db = VectorDBFactory.get_vector_db()
         self.knowledge_base = knowledge_base
 
-    def get_chunks(self, results: list[VectorSearchResult]) -> list[str]:
-        """Extract text chunks from the search results.
-
-        Args:
-            results (list[VectorSearchResult]): The search results from the vector database.
-
-        Returns:
-            list[str]: A list of relevant text chunks retrieved from the vector database.
-        """
-        return [result.chunk for result in results]
-
     def retrieve(self, query: str) -> list[VectorSearchResult]:
         """Retrieve relevant information from the vector database based on the query.
 

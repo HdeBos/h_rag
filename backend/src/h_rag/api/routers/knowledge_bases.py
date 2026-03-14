@@ -1,6 +1,5 @@
 """Knowledge Base API router for handling knowledge base-related endpoints."""
 
-import base64
 from typing import Annotated
 
 from fastapi import APIRouter, Depends
@@ -26,7 +25,7 @@ def get_knowledge_bases(
 def delete_knowledge_base(
     service: Annotated[KnowledgeBasesService, Depends(KnowledgeBasesService)],
     knowledge_base_name: str,
-):
+) -> str:
     """Endpoint to delete a knowledge base."""
     return service.delete_knowledge_base(knowledge_base_name)
 
@@ -35,7 +34,7 @@ def delete_knowledge_base(
 def create_knowledge_base(
     service: Annotated[KnowledgeBasesService, Depends(KnowledgeBasesService)],
     file_data: FileData,
-):
+) -> str:
     """Endpoint to create a knowledge base.
 
     Args:
@@ -45,5 +44,40 @@ def create_knowledge_base(
     Returns:
         The result of the knowledge base creation operation.
     """
-    file_data.data = base64.b64decode(file_data.data)
     return service.create_knowledge_base(file_data)
+
+
+@router.get("/files/{file_name}")
+def get_file(
+    service: Annotated[KnowledgeBasesService, Depends(KnowledgeBasesService)],
+    file_name: str,
+) -> str:
+    """Endpoint to retrieve a file from the knowledge base.
+
+    Args:
+        service: The KnowledgeBasesService instance injected by FastAPI.
+        file_name: The name of the file to retrieve.
+
+    Returns:
+        The base64-encoded string of the requested file.
+    """
+    return service.get_file(file_name)
+
+
+@router.get("/files/{file_name}/{highlight}")
+def get_highlighted_file(
+    service: Annotated[KnowledgeBasesService, Depends(KnowledgeBasesService)],
+    file_name: str,
+    highlight: str,
+):
+    """Endpoint to get highlighted content from a file.
+
+    Args:
+        service: The KnowledgeBasesService instance injected by FastAPI.
+        file_name: The name of the file to retrieve.
+        highlight: The text to highlight in the file.
+
+    Returns:
+        The highlighted content from the file.
+    """
+    return service.get_highlighted_file(file_name, highlight)

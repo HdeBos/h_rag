@@ -3,7 +3,7 @@
 from typing import override
 
 import chromadb
-import numpy as np
+from loguru import logger
 
 from h_rag.models.vector_search_result import VectorSearchResult
 from h_rag.vector_db.vector_db import VectorDB
@@ -31,36 +31,46 @@ class ChromaWrapper(VectorDB):
         return [collection.name for collection in collections]
 
     @override
-    def insert(self, name: str, chunks: list[str]) -> None:
+    def insert(
+        self,
+        name: str,
+        chunks: list[str],
+        doc_name: str,
+        pages: list[int],
+    ) -> None:
         collection = self.client.get_collection(name)
         ids = [str(i) for i in range(len(chunks))]
-        collection.add(ids=ids, documents=chunks)
+        metadata = [{"document_name": doc_name, "page": page} for page in pages]
+        collection.add(ids=ids, documents=chunks, metadatas=metadata)  # type: ignore
+
+    def _process_query_result(self, chunk_id, chunk, meta) -> VectorSearchResult:
+        """Process a single query result from Chroma into a VectorSearchResult object."""
+        document = str(meta.get("document_name", "unknown_document"))
+        page = meta.get("page")
+        if not isinstance(page, int):
+            logger.warning(
+                f"Expected page number to be an int, but got {type(page)}. Defaulting to 0."
+            )
+            page = 0
+        return VectorSearchResult(id=chunk_id, chunk=chunk, document=document, page=page)
+
+    def _process_query_results(self, results: chromadb.QueryResult) -> list[VectorSearchResult]:
+        """Process the raw results returned by Chroma into a list of VectorSearchResult objects."""
+        documents = results.get("documents")
+        metadatas = results.get("metadatas")
+        ids = results.get("ids")
+
+        if documents is None or metadatas is None:
+            raise ValueError("Chroma query returned incomplete results")
+
+        return [
+            self._process_query_result(chunk_id, chunk, meta)
+            for chunk_id, chunk, meta in zip(ids[0], documents[0], metadatas[0])
+        ]
 
     @override
     def query(self, name: str, query: str, n_results: int = 5) -> list[VectorSearchResult]:
         collection = self.client.get_collection(name)
         results = collection.query(query_texts=[query], n_results=n_results)
-        if results["documents"] is None or results["distances"] is None:
-            raise ValueError("Chroma query returned incomplete results")
-        vector_search_results = [
-            VectorSearchResult(id=id, chunk=chunk, similarity=similarity)
-            for (id, chunk, similarity) in zip(
-                results["ids"][0], results["documents"][0], results["distances"][0]
-            )
-        ]
+        vector_search_results = self._process_query_results(results)
         return vector_search_results
-
-    @override
-    def encode(self, text: str | list[str], type: str | None = None) -> np.ndarray:
-        if type:
-            text = (
-                f"search_{type}:" + text
-                if isinstance(text, str)
-                else [f"search_{type}:" + t for t in text]
-            )
-        embeddings = self.embedding_model.encode(text)
-        return np.asarray(embeddings, dtype=float)
-
-    @override
-    def cosine_similarity(self, vec1: np.ndarray, vec2: np.ndarray) -> float:
-        return np.dot(vec1, vec2) / (np.linalg.norm(vec1) * np.linalg.norm(vec2))

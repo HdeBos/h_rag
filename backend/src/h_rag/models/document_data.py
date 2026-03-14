@@ -11,3 +11,4 @@ class DocumentData(BaseModel):
     name: str = Field(description="Name of the file")
     type: str = Field(description="Type of the file")
     chunks: list[str] = Field(description="Extracted text chunks from the file")
+    chunk_pages: list[int] = Field(description="1-based page number for each chunk")

@@ -8,6 +8,5 @@ class VectorSearchResult(BaseModel):
 
     id: str = Field(description="Unique identifier for the retrieved chunk")
     chunk: str = Field(description="The chunk of text that was retrieved from the vector database")
-    similarity: float = Field(
-        description="The similarity score of the retrieved chunk to the query"
-    )
+    document: str = Field(description="The document the chunk was extracted from")
+    page: int = Field(description="Page the chunk was extracted from")

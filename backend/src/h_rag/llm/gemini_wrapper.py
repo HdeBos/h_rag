@@ -37,7 +37,7 @@ class GeminiWrapper(LLM):
 
     @override
     def query(self, model: str, prompt: str) -> str:
-        logger.info(f"Querying {model} with question: {prompt}")
+        logger.debug(f"Querying {model} with question: {prompt}")
         client = genai.Client()
         response = client.models.generate_content(
             model=model,

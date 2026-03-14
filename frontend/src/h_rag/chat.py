@@ -20,6 +20,13 @@ def get_model() -> str:
     return selected if selected is not None else ""
 
 
+def get_highlighted_file(file_name: str, highlight: str) -> str:
+    """Get a file from the knowledge base, with the relevant chunk highlighted."""
+    file_data = requests.get(f"http://backend:8000/knowledge-bases/files/{file_name}/{highlight}")
+    file_data = file_data.json()
+    return file_data
+
+
 if __name__ == "__main__":
     st.set_page_config(page_title="Chat", layout="wide")
     menu()
@@ -38,10 +45,10 @@ if __name__ == "__main__":
             role = msg.get("role", "user")
             content = msg.get("content", "")
             with st.chat_message(role):
-                st.write(content)
+                st.markdown(content, unsafe_allow_html=True)
 
         with st.spinner("Crafting response..."):
-            response = requests.post(
+            response_data = requests.post(
                 "http://backend:8000/chat/query",
                 json={
                     "query": query,
@@ -49,14 +56,24 @@ if __name__ == "__main__":
                     "knowledge_base": knowledge_base,
                 },
             ).json()
+            file_name = response_data.get("document", {})
+            response = response_data.get("response", "No response from server.")
+            chunk = response_data.get("chunk", "")
+            page = response_data.get("page", 0)
+            if file_name:
+                file_data = get_highlighted_file(file_name, chunk)
+                pdf_url = f"data:application/pdf;base64,{file_data}#page={page}"
+                response = (
+                    f"{response}\n\n<small><a href='{pdf_url}' target='_blank'>Source</a></small>"
+                )
 
         st.session_state.messages.append({"role": "assistant", "content": response})
         with st.chat_message("assistant"):
-            st.write(response)
+            st.markdown(response, unsafe_allow_html=True)
 
     else:
         for msg in st.session_state.messages:
             role = msg.get("role", "user")
             content = msg.get("content", "")
             with st.chat_message(role):
-                st.write(content)
+                st.markdown(content, unsafe_allow_html=True)

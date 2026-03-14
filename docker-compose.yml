@@ -10,12 +10,8 @@ services:
       - garage
     volumes:
       - ./backend/logs:/app/logs
+      - ./backend/src:/app/src
       - ./.chroma:/app/.chroma
-    develop:
-      watch:
-        - action: sync
-          path: ./backend/src
-          target: /app/src
 
   frontend:
     build: ./frontend
@@ -25,11 +21,8 @@ services:
       - "8501:8501"
     depends_on:
       - backend
-    develop:
-      watch:
-        - action: sync
-          path: ./frontend/src
-          target: /app/src
+    volumes:
+      - ./frontend/src:/app/src
 
   garage:
     image: dxflrs/garage:v2.2.0

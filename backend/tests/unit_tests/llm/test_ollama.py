@@ -10,13 +10,14 @@ class TestOllamaWrapper:
     """Test suite for the OllamaWrapper class."""
 
     @pytest.fixture()
-    def mock_ollama_chat(self, mocker: MockerFixture) -> MockerFixture:
-        """Fixture to mock the ollama.chat function."""
+    def mock_ollama_client_chat(self, mocker: MockerFixture) -> MockerFixture:
+        """Fixture to mock the OllamaWrapper's self.client.chat method."""
         return mocker.patch(
-            "h_rag.llm.ollama_wrapper.ollama.chat", return_value={"message": {"content": "Paris"}}
+            "h_rag.llm.ollama_wrapper.ollama.Client.chat",
+            return_value={"message": {"content": "Paris"}},
         )
 
-    def test_query_extends_history(self, mock_ollama_chat: MockerFixture) -> None:
+    def test_query_extends_history(self, mock_ollama_client_chat: MockerFixture) -> None:
         """Test that the query method extends the chat history."""
         # Arrange
         llm = OllamaWrapper()
