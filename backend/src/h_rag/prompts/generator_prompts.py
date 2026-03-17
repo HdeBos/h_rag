@@ -23,7 +23,7 @@ Use only the information provided in the chunks to answer the query.
 Query: {query}
 Chunks: {chunks}
 
-Provide the response in the following format, do not include ```json blocks:
+Provide the response in the following format, do not include ```json``` blocks. Do not include any text other than the JSON response.
 {{
     "response": "<The concise and informative response>",
     "chunk": "<The id of the chunk that was used to generate the response, "" if the information is insufficient to answer the query>",

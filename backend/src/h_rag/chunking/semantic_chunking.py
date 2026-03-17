@@ -81,7 +81,7 @@ class SemanticChunking(Chunking):
         sentences = self._split_into_sentences(text)
         embeddings = self.vector_db.encode(sentences, type="document")
         distances = self._calculate_distances(embeddings)
-        breakpoint_threshold = np.percentile(distances, threshold_percentile)
+        breakpoint_threshold = float(np.percentile(distances, threshold_percentile))
 
         chunks = self._create_chunks(sentences, distances, breakpoint_threshold)
         return chunks

@@ -22,7 +22,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="HRAG API", lifespan=lifespan)
 
 app.add_middleware(
-    CORSMiddleware,
+    CORSMiddleware,  # type: ignore[invalid-argument-type]
     allow_origins=["http://frontend:8501"],  # Streamlit frontend URL
     allow_credentials=True,
     allow_methods=["*"],

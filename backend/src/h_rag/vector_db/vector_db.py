@@ -83,17 +83,18 @@ class VectorDB(ABC):
         """
         pass
 
-    def encode(self, text: str | list[str], type: str | None = None) -> np.ndarray:
+    def encode(self, text: str | list[str], type: str) -> np.ndarray:
         """Encode a string or a list of strings into vectors.
 
         Args:
             text: The string or list of strings to encode.
-            type: The type of encoding, either None, "document" or "query".
+            type: The type of encoding, either "document" or "query".
 
         Returns:
             A numpy ndarray representing the encoded vector(s).
         """
-        if type:
+        model_name = get_config("vector_db", "embedding_model", "name")
+        if model_name == "nomic-ai/nomic-embed-text-v1.5":
             text = (
                 f"search_{type}:" + text
                 if isinstance(text, str)

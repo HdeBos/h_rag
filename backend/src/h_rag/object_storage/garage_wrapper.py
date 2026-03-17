@@ -1,11 +1,11 @@
 """Module for interacting with Garage object storage using boto3."""
 
-import os
 from typing import override
 
 import boto3
 from loguru import logger
 
+from h_rag.models.settings import Settings
 from h_rag.object_storage.object_storage import ObjectStorage
 
 
@@ -14,14 +14,15 @@ class GarageWrapper(ObjectStorage):
 
     def __init__(self):
         """Initialize the GarageStorage client."""
+        settings = Settings()  # type: ignore
         self.s3 = boto3.client(
             "s3",
             endpoint_url="http://garage:3900",
-            aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID", ""),
-            aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY", ""),
-            region_name=os.getenv("AWS_REGION", ""),
+            aws_access_key_id=settings.aws_access_key_id,
+            aws_secret_access_key=settings.aws_secret_access_key,
+            region_name=settings.aws_region,
         )
-        self.bucket_name = os.getenv("BUCKET_NAME", "")
+        self.bucket_name = settings.bucket_name
 
     @override
     def health_check(self) -> bool:

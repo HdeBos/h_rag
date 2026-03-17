@@ -41,7 +41,8 @@ class ChromaWrapper(VectorDB):
         collection = self.client.get_collection(name)
         ids = [str(i) for i in range(len(chunks))]
         metadata = [{"document_name": doc_name, "page": page} for page in pages]
-        collection.add(ids=ids, documents=chunks, metadatas=metadata)  # type: ignore
+        embeddings = [self.encode(chunk, "document") for chunk in chunks]
+        collection.add(ids=ids, documents=chunks, embeddings=embeddings, metadatas=metadata)  # type: ignore
 
     def _process_query_result(self, chunk_id, chunk, meta) -> VectorSearchResult:
         """Process a single query result from Chroma into a VectorSearchResult object."""
@@ -71,6 +72,7 @@ class ChromaWrapper(VectorDB):
     @override
     def query(self, name: str, query: str, n_results: int = 5) -> list[VectorSearchResult]:
         collection = self.client.get_collection(name)
-        results = collection.query(query_texts=[query], n_results=n_results)
+        query_embedding = self.encode(query, "query")
+        results = collection.query(query_embeddings=[query_embedding], n_results=n_results)
         vector_search_results = self._process_query_results(results)
         return vector_search_results
