@@ -3,10 +3,10 @@
 import base64
 
 from h_rag.data_processing.data_processor import DataProcessor
+from h_rag.db.object_storage.object_storage_factory import ObjectStorageFactory
+from h_rag.db.vector_db.vector_db_factory import VectorDbFactory
 from h_rag.models.file_data import FileData
-from h_rag.object_storage.object_storage_factory import ObjectStorageFactory
 from h_rag.tools import highlight_file
-from h_rag.vector_db.vector_db_factory import VectorDBFactory
 
 
 class KnowledgeBasesService:
@@ -18,7 +18,7 @@ class KnowledgeBasesService:
         Returns:
             A list of available knowledge bases from the vector database.
         """
-        vector_db = VectorDBFactory.get_vector_db()
+        vector_db = VectorDbFactory.get_vector_db()
         return vector_db.get_knowledge_bases()
 
     def delete_knowledge_base(self, knowledge_base_name: str) -> str:
@@ -30,7 +30,7 @@ class KnowledgeBasesService:
         Returns:
             A message indicating the result of the deletion operation.
         """
-        vector_db = VectorDBFactory.get_vector_db()
+        vector_db = VectorDbFactory.get_vector_db()
         vector_db.delete(knowledge_base_name)
         object_storage = ObjectStorageFactory.get_object_storage()
         object_storage.delete_file(knowledge_base_name)

@@ -9,16 +9,31 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Create .env file
+        run: |
+          echo "${{ secrets.ENV_FILE }}" > .env
+
       - name: Install uv
         uses: astral-sh/setup-uv@v7
         with:
           version: "0.10.2"
+          enable-cache: true
 
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
           python-version-file: "backend/pyproject.toml"
+        
+      - name: Set up Python
+        run: uv python install
 
+      - name: Start Postgres service
+        run: docker compose up -d postgres
+
+      - name: Install dependencies
+        run: uv sync --frozen
+        working-directory: backend        
+        
       - name: Run Ruff
         run: uv run ruff check --output-format=github .
         working-directory: backend
@@ -30,7 +45,11 @@ jobs:
       - name: Run unit tests
         run: uv run coverage run --source=src -m pytest tests/unit_tests
         working-directory: backend
-      
+
       - name: Generate coverage reports
         run: uv run coverage report
+        working-directory: backend
+
+      - name: Run integration tests
+        run: uv run pytest tests/integration_tests
         working-directory: backend

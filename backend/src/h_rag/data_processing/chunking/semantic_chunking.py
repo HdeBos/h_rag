@@ -6,9 +6,9 @@ import numpy as np
 import spacy
 from loguru import logger
 
-from h_rag.chunking.chunking import Chunking
 from h_rag.config.config_wrapper import get_config
-from h_rag.vector_db.vector_db_factory import VectorDBFactory
+from h_rag.data_processing.chunking.chunking import Chunking
+from h_rag.data_processing.embedding import Embedding
 
 
 class SemanticChunking(Chunking):
@@ -17,7 +17,7 @@ class SemanticChunking(Chunking):
     def __init__(self):
         """Initialize the SemanticChunking class."""
         super().__init__()
-        self.vector_db = VectorDBFactory.get_vector_db()
+        self.embedding = Embedding()
 
     def _split_into_sentences(self, text: str) -> list[str]:
         """Split text into sentences.
@@ -44,7 +44,7 @@ class SemanticChunking(Chunking):
         """
         distances = []
         for i in range(len(embeddings) - 1):
-            distance = 1 - self.vector_db.cosine_similarity(embeddings[i], embeddings[i + 1])
+            distance = 1 - self.embedding.cosine_similarity(embeddings[i], embeddings[i + 1])
             distances.append(distance)
         return distances
 
@@ -79,7 +79,7 @@ class SemanticChunking(Chunking):
         threshold_percentile = int(get_config("chunking", "semantic", "threshold_percentile"))
 
         sentences = self._split_into_sentences(text)
-        embeddings = self.vector_db.encode(sentences, type="document")
+        embeddings = self.embedding.encode(sentences, type="document")
         distances = self._calculate_distances(embeddings)
         breakpoint_threshold = float(np.percentile(distances, threshold_percentile))
 

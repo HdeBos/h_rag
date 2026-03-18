@@ -3,13 +3,13 @@
 import numpy as np
 from pytest_mock import MockerFixture
 
-from h_rag.chunking.semantic_chunking import SemanticChunking
+from h_rag.data_processing.chunking.semantic_chunking import SemanticChunking
 
 
 class TestSemanticChunking:
     """Test suite for the SemanticChunking class."""
 
-    def test_split_into_sentences(self) -> None:
+    def test_split_into_sentences(self, mock_embedding_init) -> None:
         """Test the _split_into_sentences method for splitting text into sentences."""
         # Arrange
         chunker = SemanticChunking()
@@ -26,13 +26,13 @@ class TestSemanticChunking:
             "Yes, it is.",
         ]
 
-    def test_calculate_distances(self, mocker: MockerFixture) -> None:
+    def test_calculate_distances(self, mocker: MockerFixture, mock_embedding_init) -> None:
         """Test the _calculate_distances method for calculating cosine distances between sentence embeddings."""
         # Arrange
         chunker = SemanticChunking()
         embeddings = np.array([[1, 0], [0, 1], [1, 1]])
         mock_cosine_similarity = mocker.patch.object(
-            chunker.vector_db, "cosine_similarity", side_effect=[0.0, 0.5]
+            chunker.embedding, "cosine_similarity", side_effect=[0.0, 0.5]
         )
 
         # Act
@@ -42,7 +42,7 @@ class TestSemanticChunking:
         assert distances == [1.0, 0.5]
         assert mock_cosine_similarity.call_count == 2
 
-    def test_create_chunks(self) -> None:
+    def test_create_chunks(self, mock_embedding_init) -> None:
         """Test the _create_chunks method for creating chunks based on sentence distances and a breakpoint threshold."""
         # Arrange
         chunker = SemanticChunking()
@@ -64,7 +64,7 @@ class TestSemanticChunking:
             "Is this the third sentence? Yes, it is.",
         ]
 
-    def test_chunk(self, mocker: MockerFixture, mock_config) -> None:
+    def test_chunk(self, mocker: MockerFixture, mock_config, mock_embedding_init) -> None:
         """Test the chunk method for end-to-end chunking of text."""
         # Arrange
         chunker = SemanticChunking()
@@ -80,17 +80,17 @@ class TestSemanticChunking:
             ],
         )
         mock_encode = mocker.patch.object(
-            chunker.vector_db, "encode", return_value=np.array([[1, 0], [0, 1], [1, 1], [0.5, 0.5]])
+            chunker.embedding, "encode", return_value=np.array([[1, 0], [0, 1], [1, 1], [0.5, 0.5]])
         )
         mock_config(
-            "h_rag.chunking.semantic_chunking",
+            "h_rag.data_processing.chunking.semantic_chunking",
             "chunking",
             "semantic",
             "threshold_percentile",
             return_value="25",
         )
         mock_cosine_similarity = mocker.patch.object(
-            chunker.vector_db, "cosine_similarity", side_effect=[0.0, 0.1, 0.9]
+            chunker.embedding, "cosine_similarity", side_effect=[0.0, 0.1, 0.9]
         )
 
         # Act

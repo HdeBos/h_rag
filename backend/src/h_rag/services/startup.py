@@ -2,17 +2,17 @@
 
 import asyncio
 
+from h_rag.db.object_storage.object_storage_factory import ObjectStorageFactory
+from h_rag.db.vector_db.vector_db_factory import VectorDbFactory
 from h_rag.llm.llm_factory import LLMFactory
-from h_rag.object_storage.object_storage_factory import ObjectStorageFactory
-from h_rag.tools import initialize_logger, load_env
+from h_rag.tools import initialize_logger
 
 
 class StartupService:
     """Service to check the health of various components in the system."""
 
     async def initalize_environment(self):
-        """Initialize environment variables and logger."""
-        load_env()
+        """Initialize logger."""
         initialize_logger()
 
     async def check_object_storage(self):
@@ -28,3 +28,10 @@ class StartupService:
         healthy = await asyncio.to_thread(llm.health_check)
         if not healthy:
             raise RuntimeError("LLM gateway unavailable")
+
+    async def check_vector_db(self):
+        """Check if the vector database is healthy."""
+        vector_db = VectorDbFactory.get_vector_db()
+        healthy = await asyncio.to_thread(vector_db.health_check)
+        if not healthy:
+            raise RuntimeError("Vector database unavailable")

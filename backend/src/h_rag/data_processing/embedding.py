@@ -1,13 +1,11 @@
-"""Abstract base class for vector databases."""
+"""ABC for document chunking strategies for retrieval-augmented generation (RAG) systems."""
 
-from abc import ABC, abstractmethod
 from functools import lru_cache
 
 import numpy as np
 from sentence_transformers import SentenceTransformer
 
 from h_rag.config.config_wrapper import get_config
-from h_rag.models.vector_search_result import VectorSearchResult
 
 
 @lru_cache(maxsize=1)
@@ -15,73 +13,14 @@ def _load_embedding_model(model_name: str, revision: str) -> SentenceTransformer
     return SentenceTransformer(model_name, trust_remote_code=True, revision=revision)
 
 
-class VectorDB(ABC):
-    """Abstract base class for vector databases."""
+class Embedding:
+    """Base class for document chunking strategies."""
 
     def __init__(self) -> None:
         """Initialize the vector database."""
         model_name = get_config("vector_db", "embedding_model", "name")
         revision = get_config("vector_db", "embedding_model", "revision")
         self.embedding_model = _load_embedding_model(model_name, revision)
-
-    @abstractmethod
-    def create(self, name: str) -> None:
-        """Create a knowledge base.
-
-        Args:
-            name: The name of the knowledge base to create.
-        """
-        pass
-
-    @abstractmethod
-    def delete(self, name: str) -> None:
-        """Delete a knowledge base.
-
-        Args:
-            name: The name of the knowledge base to delete.
-        """
-        pass
-
-    @abstractmethod
-    def insert(
-        self,
-        name: str,
-        chunks: list[str],
-        doc_name: str,
-        pages: list[int],
-    ) -> None:
-        """Add chunks to a knowledge base.
-
-        Args:
-            name: The name of the knowledge base to add chunks to.
-            chunks: The list of chunks to add.
-            doc_name: The name of the document the chunks belong to.
-            pages: The list of page numbers corresponding to each chunk.
-        """
-        pass
-
-    @abstractmethod
-    def query(self, name: str, query: str, n_results: int = 5) -> list["VectorSearchResult"]:
-        """Query a knowledge base.
-
-        Args:
-            name: The name of the knowledge base to query.
-            query: The query string to search for.
-            n_results: The number of results to return.
-
-        Returns:
-            A list of results from the knowledge base.
-        """
-        pass
-
-    @abstractmethod
-    def get_knowledge_bases(self) -> list[str]:
-        """Get all knowledge bases.
-
-        Returns:
-            A list of all knowledge bases.
-        """
-        pass
 
     def encode(self, text: str | list[str], type: str) -> np.ndarray:
         """Encode a string or a list of strings into vectors.

@@ -16,6 +16,7 @@ dependencies = [
     "google-genai>=1.63.0",
     "loguru>=0.7.3",
     "ollama>=0.6.1",
+    "psycopg[binary,pool]>=3.3.3",
     "pydantic-settings>=2.13.1",
     "pymupdf>=1.27.1",
     "pyyaml>=6.0.3",
@@ -29,15 +30,16 @@ dev = [
     "pytest==9.0.2",
     "pytest-mock>=3.15.1",
     "ruff==0.15.6",
-    "ty==0.0.23",
+    "ty>=0.0.24",
 ]
 
 [tool.fastapi]
 entrypoint = "src.h_rag.api.main:app"
 
-[tool.pytest.ini_options]
+[tool.pytest]
 addopts = ["--import-mode=importlib"]
 testpaths = []
+log_cli = false
 
 [tool.ruff]
 include = ["src/**.py"]
@@ -52,13 +54,9 @@ ignore = ["D107"]
 [tool.ruff.lint.pydocstyle]
 convention = "google"
 
-
-[tool.ruf.format]
+[tool.ruff.format]
 docstring-code-format = true
 line-ending = "lf"
-
-[tool.mypy]
-mypy_path = ["src"]
 
 [tool.uv.sources]
 en-core-web-sm = { url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl" }

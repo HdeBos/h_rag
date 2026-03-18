@@ -1,8 +1,8 @@
 """Factory for creating vector database instances."""
 
 from h_rag.config.config_wrapper import get_config
-from h_rag.object_storage.garage_wrapper import GarageWrapper
-from h_rag.object_storage.object_storage import ObjectStorage
+from h_rag.db.object_storage.garage_wrapper import GarageWrapper
+from h_rag.db.object_storage.object_storage import ObjectStorage
 
 
 class ObjectStorageFactory:

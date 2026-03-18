@@ -2,9 +2,9 @@
 
 import pytest
 
-from h_rag.chunking.chunking_factory import ChunkingFactory
-from h_rag.chunking.fixed_size_chunking import FixedSizeChunking
-from h_rag.chunking.semantic_chunking import SemanticChunking
+from h_rag.data_processing.chunking.chunking_factory import ChunkingFactory
+from h_rag.data_processing.chunking.fixed_size_chunking import FixedSizeChunking
+from h_rag.data_processing.chunking.semantic_chunking import SemanticChunking
 
 
 class TestChunkingFactory:
@@ -16,7 +16,10 @@ class TestChunkingFactory:
 
         def _wrapper(return_value: str):
             mock_config(
-                "h_rag.chunking.chunking_factory", "chunking", "method", return_value=return_value
+                "h_rag.data_processing.chunking.chunking_factory",
+                "chunking",
+                "method",
+                return_value=return_value,
             )
 
         return _wrapper
@@ -27,7 +30,7 @@ class TestChunkingFactory:
         chunking = ChunkingFactory.get_chunking_method()
         assert isinstance(chunking, FixedSizeChunking)
 
-    def test_get_chunking_method_semantic(self, mock_config_wrapper) -> None:
+    def test_get_chunking_method_semantic(self, mock_config_wrapper, mock_embedding_init) -> None:
         """Test that the factory returns a SemanticChunking for method 'Semantic'."""
         mock_config_wrapper("Semantic")
         chunking = ChunkingFactory.get_chunking_method()

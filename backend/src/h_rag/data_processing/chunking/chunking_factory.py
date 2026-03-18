@@ -1,9 +1,9 @@
 """Module for the Chunking Factory."""
 
-from h_rag.chunking.chunking import Chunking
-from h_rag.chunking.fixed_size_chunking import FixedSizeChunking
-from h_rag.chunking.semantic_chunking import SemanticChunking
 from h_rag.config.config_wrapper import get_config
+from h_rag.data_processing.chunking.chunking import Chunking
+from h_rag.data_processing.chunking.fixed_size_chunking import FixedSizeChunking
+from h_rag.data_processing.chunking.semantic_chunking import SemanticChunking
 
 
 class ChunkingFactory:

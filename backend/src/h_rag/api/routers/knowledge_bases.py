@@ -69,7 +69,7 @@ def get_highlighted_file(
     service: Annotated[KnowledgeBasesService, Depends(KnowledgeBasesService)],
     file_name: str,
     highlight: str,
-):
+) -> str:
     """Endpoint to get highlighted content from a file.
 
     Args:

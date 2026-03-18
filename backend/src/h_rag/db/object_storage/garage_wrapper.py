@@ -5,8 +5,8 @@ from typing import override
 import boto3
 from loguru import logger
 
-from h_rag.models.settings import Settings
-from h_rag.object_storage.object_storage import ObjectStorage
+from h_rag.db.object_storage.object_storage import ObjectStorage
+from h_rag.models.settings import get_settings
 
 
 class GarageWrapper(ObjectStorage):
@@ -14,12 +14,12 @@ class GarageWrapper(ObjectStorage):
 
     def __init__(self):
         """Initialize the GarageStorage client."""
-        settings = Settings()  # type: ignore
+        settings = get_settings()
         self.s3 = boto3.client(
             "s3",
             endpoint_url="http://garage:3900",
             aws_access_key_id=settings.aws_access_key_id,
-            aws_secret_access_key=settings.aws_secret_access_key,
+            aws_secret_access_key=settings.aws_secret_access_key.get_secret_value(),
             region_name=settings.aws_region,
         )
         self.bucket_name = settings.bucket_name

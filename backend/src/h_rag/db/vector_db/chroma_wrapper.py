@@ -5,8 +5,8 @@ from typing import override
 import chromadb
 from loguru import logger
 
+from h_rag.db.vector_db.vector_db import VectorDB
 from h_rag.models.vector_search_result import VectorSearchResult
-from h_rag.vector_db.vector_db import VectorDB
 
 
 class ChromaWrapper(VectorDB):
@@ -16,6 +16,16 @@ class ChromaWrapper(VectorDB):
         """Initialize the Chroma client."""
         super().__init__()
         self.client = chromadb.PersistentClient(".chroma")
+
+    @override
+    def health_check(self) -> bool:
+        try:
+            self.client.list_collections()
+            logger.info("Chroma health check successful")
+            return True
+        except Exception as e:
+            logger.error(f"Chroma health check failed: {e}")
+            return False
 
     @override
     def create(self, name: str) -> None:
@@ -41,7 +51,7 @@ class ChromaWrapper(VectorDB):
         collection = self.client.get_collection(name)
         ids = [str(i) for i in range(len(chunks))]
         metadata = [{"document_name": doc_name, "page": page} for page in pages]
-        embeddings = [self.encode(chunk, "document") for chunk in chunks]
+        embeddings = [self.embedding.encode(chunk, "document") for chunk in chunks]
         collection.add(ids=ids, documents=chunks, embeddings=embeddings, metadatas=metadata)  # type: ignore
 
     def _process_query_result(self, chunk_id, chunk, meta) -> VectorSearchResult:
@@ -72,7 +82,7 @@ class ChromaWrapper(VectorDB):
     @override
     def query(self, name: str, query: str, n_results: int = 5) -> list[VectorSearchResult]:
         collection = self.client.get_collection(name)
-        query_embedding = self.encode(query, "query")
+        query_embedding = self.embedding.encode(query, "query")
         results = collection.query(query_embeddings=[query_embedding], n_results=n_results)
         vector_search_results = self._process_query_results(results)
         return vector_search_results

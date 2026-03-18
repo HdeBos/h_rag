@@ -1,25 +1,37 @@
-logger:
-  loguru_level: "INFO"
+common:
+  logger:
+    loguru_level: "INFO"
 
-llm:
-  provider: "Ollama" # Options: "Ollama", "Gemini"
+  llm:
+    provider: "Ollama" # Options: "Ollama", "Gemini"
 
-chunking:
-  method: "Semantic" # Options: "FixedSize", "Semantic"
-  fixed_size:
-    size: 400
-    overlap: 60
-  semantic:
-    threshold_percentile: 70
+  chunking:
+    method: "Semantic" # Options: "FixedSize", "Semantic"
+    fixed_size:
+      size: 400
+      overlap: 60
+    semantic:
+      threshold_percentile: 70
 
-object_storage:
-  provider: "Garage" # Options: "Garage"
+  object_storage:
+    provider: "Garage" # Options: "Garage"
 
-vector_db:
-  provider: "Chroma" # Options: "Chroma"
-  embedding_model:
-    name: "nomic-ai/nomic-embed-text-v1.5" # Options: "nomic-ai/nomic-embed-text-v1.5", "all-MiniLM-L6-v2"
-    revision: "e5cf08a" # Options (matchine name above): "e5cf08a", "c9745ed"
+  vector_db:
+    provider: "PgVector" # Options: "Chroma", "PgVector"
+    embedding_model:
+      name: "nomic-ai/nomic-embed-text-v1.5" # Options: "nomic-ai/nomic-embed-text-v1.5", "all-MiniLM-L6-v2"
+      revision: "e5cf08a" # Options (matchine name above): "e5cf08a", "c9745ed"
 
-run:
-  workflow: "Default" # Options: "Default"
+  run:
+    workflow: "Default" # Options: "Default"
+
+local:
+  postgres:
+    host: "localhost"
+    port: 5432
+
+
+docker:
+  postgres:
+    host: "postgres"
+    port: 5432

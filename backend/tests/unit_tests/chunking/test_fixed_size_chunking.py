@@ -3,7 +3,7 @@
 import pytest
 from pytest_mock import MockerFixture
 
-from h_rag.chunking.fixed_size_chunking import FixedSizeChunking
+from h_rag.data_processing.chunking.fixed_size_chunking import FixedSizeChunking
 
 
 class TestFixedSizeChunking:
@@ -13,7 +13,7 @@ class TestFixedSizeChunking:
     def mock_get_chunk_size(self, mocker: MockerFixture) -> MockerFixture:
         """Fixture to mock the _get_chunk_size method."""
         return mocker.patch(
-            "h_rag.chunking.fixed_size_chunking.FixedSizeChunking._get_chunk_size",
+            "h_rag.data_processing.chunking.fixed_size_chunking.FixedSizeChunking._get_chunk_size",
             return_value=5,
         )
 
@@ -21,7 +21,7 @@ class TestFixedSizeChunking:
     def mock_get_overlap(self, mocker: MockerFixture) -> MockerFixture:
         """Fixture to mock the _get_overlap method."""
         return mocker.patch(
-            "h_rag.chunking.fixed_size_chunking.FixedSizeChunking._get_overlap",
+            "h_rag.data_processing.chunking.fixed_size_chunking.FixedSizeChunking._get_overlap",
             return_value=2,
         )
 
@@ -43,7 +43,7 @@ class TestFixedSizeChunking:
         """Test the _get_chunk_size method."""
         # Arrange
         mock_config(
-            "h_rag.chunking.fixed_size_chunking",
+            "h_rag.data_processing.chunking.fixed_size_chunking",
             "chunking",
             "fixed_size",
             "size",
@@ -58,7 +58,7 @@ class TestFixedSizeChunking:
         """Test the _get_overlap method."""
         # Arrange
         mock_config(
-            "h_rag.chunking.fixed_size_chunking",
+            "h_rag.data_processing.chunking.fixed_size_chunking",
             "chunking",
             "fixed_size",
             "overlap",

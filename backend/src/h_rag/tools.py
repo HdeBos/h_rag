@@ -3,15 +3,9 @@
 import sys
 
 import fitz
-from dotenv import load_dotenv
 from loguru import logger
 
 from h_rag.config.config_wrapper import get_config
-
-
-def load_env():
-    """Load environment variables from .env file."""
-    load_dotenv(override=True)
 
 
 def initialize_logger():

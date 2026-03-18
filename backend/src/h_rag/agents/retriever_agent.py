@@ -2,8 +2,8 @@
 
 from loguru import logger
 
+from h_rag.db.vector_db.vector_db_factory import VectorDbFactory
 from h_rag.models.vector_search_result import VectorSearchResult
-from h_rag.vector_db.vector_db_factory import VectorDBFactory
 
 
 class RetrieverAgent:
@@ -11,7 +11,7 @@ class RetrieverAgent:
 
     def __init__(self, knowledge_base: str):
         """Initialize the RetrieverAgent with a vector database instance."""
-        self.vector_db = VectorDBFactory.get_vector_db()
+        self.vector_db = VectorDbFactory.get_vector_db()
         self.knowledge_base = knowledge_base
 
     def retrieve(self, query: str) -> list[VectorSearchResult]:

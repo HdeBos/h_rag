@@ -2,8 +2,8 @@
 
 from typing import override
 
-from h_rag.chunking.chunking import Chunking
 from h_rag.config.config_wrapper import get_config
+from h_rag.data_processing.chunking.chunking import Chunking
 
 
 class FixedSizeChunking(Chunking):
