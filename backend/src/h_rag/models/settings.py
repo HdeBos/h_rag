@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     """Application settings loaded from .env file."""
 
     gemini_api_key: SecretStr
+    mistral_api_key: SecretStr
 
     # Garage Object Storage settings
     aws_access_key_id: str

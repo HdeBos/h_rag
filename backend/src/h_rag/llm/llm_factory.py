@@ -3,6 +3,7 @@
 from h_rag.config.config_wrapper import get_config
 from h_rag.llm.gemini_wrapper import GeminiWrapper
 from h_rag.llm.llm import LLM
+from h_rag.llm.mistral_wrapper import MistralWrapper
 from h_rag.llm.ollama_wrapper import OllamaWrapper
 
 
@@ -12,6 +13,7 @@ class LLMFactory:
     _llm_providers = {
         "Gemini": GeminiWrapper,
         "Ollama": OllamaWrapper,
+        "Mistral": MistralWrapper,
     }
 
     @classmethod

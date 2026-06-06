@@ -3,7 +3,7 @@ common:
     loguru_level: "INFO"
 
   llm:
-    provider: "Ollama" # Options: "Ollama", "Gemini"
+    provider: "Mistral" # Options: "Ollama", "Gemini", "Mistral"
 
   chunking:
     method: "Semantic" # Options: "FixedSize", "Semantic"
