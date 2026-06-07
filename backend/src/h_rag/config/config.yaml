@@ -17,7 +17,7 @@ common:
     provider: "Garage" # Options: "Garage"
 
   vector_db:
-    provider: "PgVector" # Options: "Chroma", "PgVector"
+    provider: "PgVector" # Options: "PgVector"
     embedding_model:
       name: "nomic-ai/nomic-embed-text-v1.5" # Options: "nomic-ai/nomic-embed-text-v1.5", "all-MiniLM-L6-v2"
       revision: "e5cf08a" # Options (matchine name above): "e5cf08a", "c9745ed"

@@ -3,7 +3,6 @@
 import pytest
 from pytest_mock import MockerFixture
 
-from h_rag.db.vector_db.chroma_wrapper import ChromaWrapper
 from h_rag.db.vector_db.pg_vector_wrapper import PgVectorWrapper
 from h_rag.db.vector_db.vector_db_factory import VectorDbFactory
 
@@ -24,12 +23,6 @@ class TestVectorDBFactory:
             )
 
         return _wrapper
-
-    def test_get_vector_db_provider_chroma(self, mock_config_wrapper, mock_embedding_init) -> None:
-        """Test that the factory returns a Chroma vector DB for provider 'Chroma'."""
-        mock_config_wrapper("Chroma")
-        vector_db = VectorDbFactory.get_vector_db()
-        assert isinstance(vector_db, ChromaWrapper)
 
     def test_get_vector_db_provider_pgvector(
         self, mocker: MockerFixture, mock_embedding_init

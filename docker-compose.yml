@@ -12,7 +12,6 @@ services:
     volumes:
       - ./backend/logs:/app/logs
       - ./backend/src:/app/src
-      - ./.chroma:/app/.chroma
     env_file:
       - .env
       - ./backend/.env
