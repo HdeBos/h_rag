@@ -3,8 +3,8 @@
 import pytest
 from pytest_mock import MockerFixture
 
-from h_rag.db.vector_db.pg_vector_wrapper import PgVectorWrapper
-from h_rag.db.vector_db.vector_db_factory import VectorDbFactory
+from h_rag.db.pg_vector_wrapper import PgVectorWrapper
+from h_rag.db.vector_db_factory import VectorDbFactory
 
 
 class TestVectorDBFactory:
@@ -16,7 +16,7 @@ class TestVectorDBFactory:
 
         def _wrapper(return_value: str) -> None:
             mock_config(
-                "h_rag.db.vector_db.vector_db_factory",
+                "h_rag.db.vector_db_factory",
                 "vector_db",
                 "provider",
                 return_value=return_value,
@@ -34,16 +34,14 @@ class TestVectorDBFactory:
             ("postgres", "port"): "5432",
         }
         mocker.patch(
-            "h_rag.db.vector_db.vector_db_factory.get_config",
+            "h_rag.db.vector_db_factory.get_config",
             side_effect=lambda *args: config_values.get(args),
         )
         mock_settings = mocker.Mock()
         mock_settings.postgres_db = "test_db"
         mock_settings.postgres_user = "test_user"
         mock_settings.postgres_password.get_secret_value.return_value = "test_password"
-        mocker.patch(
-            "h_rag.db.vector_db.vector_db_factory.get_settings", return_value=mock_settings
-        )
+        mocker.patch("h_rag.db.vector_db_factory.get_settings", return_value=mock_settings)
         mocker.patch.object(PgVectorWrapper, "__init__", return_value=None)
         vector_db = VectorDbFactory.get_vector_db()
         assert isinstance(vector_db, PgVectorWrapper)

@@ -1,27 +1,26 @@
 """Module for Pg vector database wrapper."""
 
 import hashlib
-from typing import override
 
 from loguru import logger
 
+from h_rag.data_processing.embedding import Embedding
 from h_rag.db.postgres_wrapper import PostgresWrapper
-from h_rag.db.vector_db.vector_db import VectorDB
 from h_rag.models.vector_search_result import VectorSearchResult
 
 
-class PgVectorWrapper(VectorDB, PostgresWrapper):
+class PgVectorWrapper(PostgresWrapper):
     """Wrapper for Pg vector database."""
 
     def __init__(self, db_name: str, user: str, password: str, host: str, port: int):
         """Initialize the pgvector database wrapper."""
-        VectorDB.__init__(self)
         PostgresWrapper.__init__(
             self, db_name=db_name, user=user, password=password, host=host, port=port
         )
+        self.embedding = Embedding()
 
-    @override
     def health_check(self) -> bool:
+        """Check if the vector database is healthy and can be reached."""
         try:
             with self.connect_with_cursor() as (_, cur):
                 cur.execute("SELECT 1;")
@@ -32,8 +31,12 @@ class PgVectorWrapper(VectorDB, PostgresWrapper):
             logger.error(f"PgVector health check failed: {e}")
             return False
 
-    @override
     def create(self, name: str) -> None:
+        """Create a knowledge base.
+
+        Args:
+            name: The name of the knowledge base to create.
+        """
         with self.connect_with_cursor() as (conn, cur):
             cur.execute(
                 """
@@ -45,8 +48,12 @@ class PgVectorWrapper(VectorDB, PostgresWrapper):
             )
             conn.commit()
 
-    @override
     def delete(self, name: str) -> None:
+        """Delete a knowledge base.
+
+        Args:
+            name: The name of the knowledge base to delete.
+        """
         with self.connect_with_cursor() as (conn, cur):
             cur.execute(
                 """
@@ -57,7 +64,6 @@ class PgVectorWrapper(VectorDB, PostgresWrapper):
             )
             conn.commit()
 
-    @override
     def insert(
         self,
         name: str,
@@ -65,6 +71,14 @@ class PgVectorWrapper(VectorDB, PostgresWrapper):
         doc_name: str,
         pages: list[int],
     ) -> None:
+        """Add chunks to a knowledge base.
+
+        Args:
+            name: The name of the knowledge base to add chunks to.
+            chunks: The list of chunks to add.
+            doc_name: The name of the document the chunks belong to.
+            pages: The list of page numbers corresponding to each chunk.
+        """
         # Encode outside the DB transaction to avoid holding the connection open during slow I/O
         embeddings = [self.embedding.encode(chunk, "document").tolist() for chunk in chunks]
         checksum = hashlib.sha256(doc_name.encode()).digest()
@@ -92,14 +106,14 @@ class PgVectorWrapper(VectorDB, PostgresWrapper):
                 result = cur.fetchone()
             doc_id = result[0]  # pyright: ignore[reportOptionalSubscript]
 
-            cur.execute(
-                """
-                INSERT INTO knowledge_base_document (knowledge_base_id, document_id)
-                VALUES (%s, %s)
-                ON CONFLICT DO NOTHING;
-                """,
-                (kb_id, doc_id),
-            )
+            # cur.execute(
+            #     """
+            #     INSERT INTO knowledge_base_document (knowledge_base_id, document_id)
+            #     VALUES (%s, %s)
+            #     ON CONFLICT DO NOTHING;
+            #     """,
+            #     (kb_id, doc_id),
+            # )
 
             cur.executemany(
                 """
@@ -113,8 +127,17 @@ class PgVectorWrapper(VectorDB, PostgresWrapper):
             )
             conn.commit()
 
-    @override
     def query(self, name: str, query: str, n_results: int = 5) -> list[VectorSearchResult]:
+        """Query a knowledge base.
+
+        Args:
+            name: The name of the knowledge base to query.
+            query: The query string to search for.
+            n_results: The number of results to return.
+
+        Returns:
+            A list of results from the knowledge base.
+        """
         # Encode outside the DB transaction to avoid holding the connection open during slow I/O
         query_embedding = self.embedding.encode(query, "query").tolist()
 
@@ -144,8 +167,12 @@ class PgVectorWrapper(VectorDB, PostgresWrapper):
             for row in rows
         ]
 
-    @override
     def get_knowledge_bases(self) -> list[str]:
+        """Get all knowledge bases.
+
+        Returns:
+            A list of all knowledge bases.
+        """
         with self.connect_with_cursor() as (_, cur):
             cur.execute("SELECT name FROM knowledge_base;")
             results = cur.fetchall()

@@ -2,9 +2,9 @@
 
 import asyncio
 
-from h_rag.db.object_storage.object_storage_factory import ObjectStorageFactory
-from h_rag.db.vector_db.vector_db_factory import VectorDbFactory
+from h_rag.db.vector_db_factory import VectorDbFactory
 from h_rag.llm.llm_factory import LLMFactory
+from h_rag.object_storage.object_storage_factory import ObjectStorageFactory
 from h_rag.tools import initialize_logger
 
 

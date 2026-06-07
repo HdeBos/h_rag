@@ -5,8 +5,8 @@ from typing import override
 import boto3
 from loguru import logger
 
-from h_rag.db.object_storage.object_storage import ObjectStorage
 from h_rag.models.settings import get_settings
+from h_rag.object_storage.object_storage import ObjectStorage
 
 
 class GarageWrapper(ObjectStorage):

@@ -5,7 +5,7 @@ from collections.abc import Generator
 import pytest
 from psycopg import sql
 
-from h_rag.db.vector_db.pg_vector_wrapper import PgVectorWrapper
+from h_rag.db.pg_vector_wrapper import PgVectorWrapper
 
 
 @pytest.fixture(autouse=True)

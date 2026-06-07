@@ -2,7 +2,7 @@
 
 from loguru import logger
 
-from h_rag.db.vector_db.vector_db_factory import VectorDbFactory
+from h_rag.db.vector_db_factory import VectorDbFactory
 from h_rag.models.vector_search_result import VectorSearchResult
 
 

@@ -3,9 +3,9 @@
 import base64
 
 from h_rag.data_processing.data_processor import DataProcessor
-from h_rag.db.object_storage.object_storage_factory import ObjectStorageFactory
-from h_rag.db.vector_db.vector_db_factory import VectorDbFactory
+from h_rag.db.vector_db_factory import VectorDbFactory
 from h_rag.models.file_data import FileData
+from h_rag.object_storage.object_storage_factory import ObjectStorageFactory
 from h_rag.tools import highlight_file
 
 

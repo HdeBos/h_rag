@@ -1,8 +1,7 @@
 """Factory for creating vector database instances."""
 
 from h_rag.config.config_wrapper import get_config
-from h_rag.db.vector_db.pg_vector_wrapper import PgVectorWrapper
-from h_rag.db.vector_db.vector_db import VectorDB
+from h_rag.db.pg_vector_wrapper import PgVectorWrapper
 from h_rag.models.settings import get_settings
 
 
@@ -13,7 +12,7 @@ class VectorDbFactory:
     _known_providers = {"PgVector"}
 
     @classmethod
-    def get_vector_db(cls) -> VectorDB:
+    def get_vector_db(cls):
         """Factory Method."""
         method = get_config("vector_db", "provider")
         if method not in cls._known_providers:
