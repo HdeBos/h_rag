@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from h_rag.api.routers import chat, knowledge_bases
+from h_rag.api.routers import chat, documents, knowledge_bases
 from h_rag.services.startup import StartupService
 
 
@@ -32,5 +32,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(chat.router)
+app.include_router(documents.router)
 app.include_router(knowledge_bases.router)
+app.include_router(chat.router)

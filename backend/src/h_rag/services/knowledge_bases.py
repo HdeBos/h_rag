@@ -2,48 +2,46 @@
 
 import base64
 
+from loguru import logger
+
 from h_rag.data_processing.data_processor import DataProcessor
 from h_rag.db.pg_vector_wrapper import PgVectorWrapper
 from h_rag.db.postgres_wrapper import PostgresWrapper
 from h_rag.models.file_data import FileData
 from h_rag.object_storage.object_storage_factory import ObjectStorageFactory
-from h_rag.tools import highlight_file
 
 
 class KnowledgeBasesService:
     """Service for handling knowledge base interactions."""
 
-    def __init__(self, pg_conn: PostgresWrapper):
+    def __init__(self, postgres_wrapper: PostgresWrapper):
         """Initialize the knowledge bases service."""
-        self.pg = pg_conn
+        self._pg = postgres_wrapper
 
     def get_knowledge_bases(self) -> list[str]:
-        """Endpoint to get available knowledge bases.
+        """Get available knowledge bases.
 
         Returns:
             A list of available knowledge bases from the vector database.
         """
-        vector_db = PgVectorWrapper(self.pg)
-        return vector_db.get_knowledge_bases()
+        knowledge_base_store = PgVectorWrapper(self._pg)
+        return knowledge_base_store.get_knowledge_bases()
 
-    def delete_knowledge_base(self, knowledge_base_name: str) -> str:
-        """Endpoint to delete a knowledge base.
+    def delete_knowledge_base(self, knowledge_base_name: str) -> None:
+        """Delete a knowledge base.
 
         Args:
             knowledge_base_name: The name of the knowledge base to delete.
-
-        Returns:
-            A message indicating the result of the deletion operation.
         """
-        vector_db = PgVectorWrapper(self.pg)
-        vector_db.delete(knowledge_base_name)
+        knowledge_base_store = PgVectorWrapper(self._pg)
+        knowledge_base_store.delete(knowledge_base_name)
+        logger.info(f"Deleted knowledge base '{knowledge_base_name}''")
         object_storage = ObjectStorageFactory.get_object_storage()
         object_storage.delete_file(knowledge_base_name)
-
-        return f"Knowledge base '{knowledge_base_name}' deleted successfully."
+        logger.info(f"Deleted '{knowledge_base_name}' from object storage")
 
     def create_knowledge_base(self, file_data: FileData) -> str:
-        """Endpoint to create a knowledge base.
+        """Create a knowledge base.
 
         Args:
             file_data: The data of the file to be processed and added to the knowledge base.
@@ -54,36 +52,31 @@ class KnowledgeBasesService:
         file_data.data = base64.b64decode(file_data.data)
         data_processor = DataProcessor()
         data = data_processor.process_file(file_data)
-        data_processor.store_data(self.pg, data)
+        data_processor.store_data(self._pg, data)
         return f"Knowledge base '{file_data.name}' created successfully."
 
-    def get_file(self, file_name: str) -> str:
-        """Endpoint to retrieve a file from the knowledge base.
+    def add_document_to_knowledge_base(self, knowledge_base_name: str, file_name: str) -> str:
+        """Add a document to an existing knowledge base.
 
         Args:
-            file_name: The name of the file to retrieve.
+            knowledge_base_name: The name of the knowledge base to add the document to.
+            file_name: The name of the document to add.
 
         Returns:
-            The base64-encoded string of the requested file.
+            The result of the document addition operation.
         """
-        object_storage = ObjectStorageFactory.get_object_storage()
+        knowledge_base_store = PgVectorWrapper(self._pg)
+        knowledge_base_store.add_document_to_kb(knowledge_base_name, file_name)
+        return (
+            f"Document '{file_name}' added to knowledge base '{knowledge_base_name}' successfully."
+        )
 
-        file_bytes = object_storage.get_file(file_name)
-        file_b64 = base64.b64encode(file_bytes).decode("utf-8")
-        return file_b64
-
-    def get_highlighted_file(self, file_name: str, highlight: str) -> str:
-        """Endpoint to get highlighted content from a file.
+    def remove_document_from_knowledge_base(self, knowledge_base_name: str, file_name: str) -> None:
+        """Remove a document from a knowledge base.
 
         Args:
-            file_name: The name of the file to retrieve.
-            highlight: The text to highlight in the file.
-
-        Returns:
-            The highlighted content from the file.
+            knowledge_base_name: The name of the knowledge base to remove the document from.
+            file_name: The name of the document to remove.
         """
-        object_storage = ObjectStorageFactory.get_object_storage()
-        file_bytes = object_storage.get_file(file_name)
-        highlighted_content = highlight_file(file_bytes, highlight)
-        highlighted_content_b64 = base64.b64encode(highlighted_content).decode("utf-8")
-        return highlighted_content_b64
+        knowledge_base_store = PgVectorWrapper(self._pg)
+        knowledge_base_store.remove_document_from_kb(knowledge_base_name, file_name)

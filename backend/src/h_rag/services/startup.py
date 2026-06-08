@@ -3,7 +3,6 @@
 import asyncio
 
 from h_rag.config.config_wrapper import get_config
-from h_rag.db.pg_vector_wrapper import PgVectorWrapper
 from h_rag.db.postgres_wrapper import PostgresWrapper
 from h_rag.llm.llm_factory import LLMFactory
 from h_rag.models.settings import get_settings

@@ -22,7 +22,9 @@ def get_model() -> str:
 
 def get_highlighted_file(file_name: str, highlight: str) -> str:
     """Get a file from the knowledge base, with the relevant chunk highlighted."""
-    file_data = requests.get(f"http://backend:8000/knowledge-bases/files/{file_name}/{highlight}")
+    file_data = requests.get(
+        f"http://backend:8000/documents/{file_name}/highlighted", params={"highlight": highlight}
+    )
     file_data = file_data.json()
     return file_data
 
@@ -60,6 +62,7 @@ if __name__ == "__main__":
             response = response_data.get("response", "No response from server.")
             chunk = response_data.get("chunk", "")
             page = response_data.get("page", 0)
+            print(chunk)
             if file_name:
                 file_data = get_highlighted_file(file_name, chunk)
                 pdf_url = f"data:application/pdf;base64,{file_data}#page={page}"

@@ -10,7 +10,7 @@ from h_rag.services.knowledge_bases import KnowledgeBasesService
 
 router = APIRouter(
     prefix="/knowledge-bases",
-    tags=["knowledge-bases"],
+    tags=["Knowledge bases"],
 )
 
 
@@ -18,25 +18,37 @@ router = APIRouter(
 def get_knowledge_bases(
     service: Annotated[KnowledgeBasesService, Depends(get_knowledge_bases_service)],
 ) -> list[str]:
-    """Endpoint to get available knowledge bases."""
+    """Get all available knowledge bases.
+
+    Args:
+        service: The KnowledgeBasesService instance.
+
+    Returns:
+        A list of knowledge base names.
+    """
     return service.get_knowledge_bases()
 
 
-@router.delete("/{knowledge_base_name}")
+@router.delete("/{knowledge_base_name}", status_code=204)
 def delete_knowledge_base(
     service: Annotated[KnowledgeBasesService, Depends(get_knowledge_bases_service)],
     knowledge_base_name: str,
-) -> str:
-    """Endpoint to delete a knowledge base."""
-    return service.delete_knowledge_base(knowledge_base_name)
+) -> None:
+    """Delete a knowledge base.
+
+    Args:
+        service: The KnowledgeBasesService instance injected by FastAPI.
+        knowledge_base_name: The name of the knowledge base to delete.
+    """
+    service.delete_knowledge_base(knowledge_base_name)
 
 
-@router.post("/")
+@router.post("/", status_code=201)
 def create_knowledge_base(
     service: Annotated[KnowledgeBasesService, Depends(get_knowledge_bases_service)],
     file_data: FileData,
 ) -> str:
-    """Endpoint to create a knowledge base.
+    """Create a knowledge base.
 
     Args:
         service: The KnowledgeBasesService instance injected by FastAPI.
@@ -48,37 +60,36 @@ def create_knowledge_base(
     return service.create_knowledge_base(file_data)
 
 
-@router.get("/files/{file_name}")
-def get_file(
+@router.post("/{knowledge_base_name}/documents", status_code=201)
+def add_document_to_knowledge_base(
     service: Annotated[KnowledgeBasesService, Depends(get_knowledge_bases_service)],
+    knowledge_base_name: str,
     file_name: str,
 ) -> str:
-    """Endpoint to retrieve a file from the knowledge base.
+    """Add a document to an existing knowledge base.
 
     Args:
         service: The KnowledgeBasesService instance injected by FastAPI.
-        file_name: The name of the file to retrieve.
+        knowledge_base_name: The name of the knowledge base to add the document to.
+        file_name: The name of the document to be added.
 
     Returns:
-        The base64-encoded string of the requested file.
+        The result of the document addition operation.
     """
-    return service.get_file(file_name)
+    return service.add_document_to_knowledge_base(knowledge_base_name, file_name)
 
 
-@router.get("/files/{file_name}/{highlight}")
-def get_highlighted_file(
+@router.delete("/{knowledge_base_name}/files/{file_name}", status_code=204)
+def remove_document_from_knowledge_base(
     service: Annotated[KnowledgeBasesService, Depends(get_knowledge_bases_service)],
+    knowledge_base_name: str,
     file_name: str,
-    highlight: str,
-) -> str:
-    """Endpoint to get highlighted content from a file.
+) -> None:
+    """Remove a document from an existing knowledge base.
 
     Args:
         service: The KnowledgeBasesService instance injected by FastAPI.
-        file_name: The name of the file to retrieve.
-        highlight: The text to highlight in the file.
-
-    Returns:
-        The highlighted content from the file.
+        knowledge_base_name: The name of the knowledge base to remove the document from.
+        file_name: The name of the document to be removed.
     """
-    return service.get_highlighted_file(file_name, highlight)
+    service.remove_document_from_knowledge_base(knowledge_base_name, file_name)

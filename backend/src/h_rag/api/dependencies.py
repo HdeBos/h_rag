@@ -6,6 +6,7 @@ from fastapi import Depends, Request
 
 from h_rag.db.postgres_wrapper import PostgresWrapper
 from h_rag.services.chat import ChatService
+from h_rag.services.documents import DocumentsService
 from h_rag.services.knowledge_bases import KnowledgeBasesService
 
 
@@ -26,3 +27,10 @@ def get_chat_service(
 ) -> ChatService:
     """Provide a ChatService backed by the shared connection pool."""
     return ChatService(postgres_wrapper)
+
+
+def get_documents_service(
+    postgres_wrapper: Annotated[PostgresWrapper, Depends(get_postgres_wrapper)],
+) -> DocumentsService:
+    """Provide a ChatService backed by the shared connection pool."""
+    return DocumentsService(postgres_wrapper)
