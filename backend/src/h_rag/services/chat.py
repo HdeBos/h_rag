@@ -1,5 +1,6 @@
 """Service layer for the chat router."""
 
+from h_rag.db.postgres_wrapper import PostgresWrapper
 from h_rag.llm.llm_factory import LLMFactory
 from h_rag.models.chat_response import ChatResponse
 from h_rag.workflows.workflow_factory import WorkflowFactory
@@ -8,6 +9,10 @@ from src.h_rag.models.chat_query import ChatQuery
 
 class ChatService:
     """Service for handling chat interactions."""
+
+    def __init__(self, pg_conn: PostgresWrapper):
+        """Initialize the knowledge bases service."""
+        self._pg = pg_conn
 
     def get_models(self) -> list[str]:
         """Get available models.
@@ -27,6 +32,8 @@ class ChatService:
         Returns:
             The response from the LLM.
         """
-        workflow = WorkflowFactory.get_workflow(chat_query.model, chat_query.knowledge_base)
+        workflow = WorkflowFactory.get_workflow(
+            self._pg, chat_query.model, chat_query.knowledge_base
+        )
         response = workflow.execute(chat_query.query)
         return response

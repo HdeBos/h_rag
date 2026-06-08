@@ -3,31 +3,25 @@
 import pytest
 from pytest_mock import MockerFixture
 
-from h_rag.config.config_wrapper import get_config
 from h_rag.db.pg_vector_wrapper import PgVectorWrapper
+from h_rag.db.postgres_wrapper import PostgresWrapper
 from h_rag.models.settings import get_settings
 
 
 @pytest.fixture()
-def wrapper(mocker: MockerFixture) -> PgVectorWrapper:
+def wrapper(mocker: MockerFixture, postgres_connection: PostgresWrapper) -> PgVectorWrapper:
     """Provide a PgVectorWrapper with the embedding model bypassed."""
     mocker.patch(
         "h_rag.data_processing.embedding.Embedding.__init__", return_value=None, autospec=True
     )
     settings = get_settings()
-    return PgVectorWrapper(
-        db_name="test_postgres_db",
-        user=settings.postgres_user,
-        password=settings.postgres_password.get_secret_value(),
-        host=get_config("postgres", "host"),
-        port=int(get_config("postgres", "port")),
-    )
+    return PgVectorWrapper(postgres_connection)
 
 
 @pytest.fixture
-def db_cursor(wrapper: PgVectorWrapper):
+def db_cursor(postgres_connection: PostgresWrapper):
     """Fixture to provide a database cursor."""
-    with wrapper.connect_with_cursor() as (_, cur):
+    with postgres_connection.get_connection() as (_, cur):
         yield cur
 
 

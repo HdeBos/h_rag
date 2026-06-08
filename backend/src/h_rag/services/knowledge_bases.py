@@ -3,7 +3,8 @@
 import base64
 
 from h_rag.data_processing.data_processor import DataProcessor
-from h_rag.db.vector_db_factory import VectorDbFactory
+from h_rag.db.pg_vector_wrapper import PgVectorWrapper
+from h_rag.db.postgres_wrapper import PostgresWrapper
 from h_rag.models.file_data import FileData
 from h_rag.object_storage.object_storage_factory import ObjectStorageFactory
 from h_rag.tools import highlight_file
@@ -12,13 +13,17 @@ from h_rag.tools import highlight_file
 class KnowledgeBasesService:
     """Service for handling knowledge base interactions."""
 
+    def __init__(self, pg_conn: PostgresWrapper):
+        """Initialize the knowledge bases service."""
+        self.pg = pg_conn
+
     def get_knowledge_bases(self) -> list[str]:
         """Endpoint to get available knowledge bases.
 
         Returns:
             A list of available knowledge bases from the vector database.
         """
-        vector_db = VectorDbFactory.get_vector_db()
+        vector_db = PgVectorWrapper(self.pg)
         return vector_db.get_knowledge_bases()
 
     def delete_knowledge_base(self, knowledge_base_name: str) -> str:
@@ -30,7 +35,7 @@ class KnowledgeBasesService:
         Returns:
             A message indicating the result of the deletion operation.
         """
-        vector_db = VectorDbFactory.get_vector_db()
+        vector_db = PgVectorWrapper(self.pg)
         vector_db.delete(knowledge_base_name)
         object_storage = ObjectStorageFactory.get_object_storage()
         object_storage.delete_file(knowledge_base_name)
@@ -49,7 +54,7 @@ class KnowledgeBasesService:
         file_data.data = base64.b64decode(file_data.data)
         data_processor = DataProcessor()
         data = data_processor.process_file(file_data)
-        data_processor.store_data(data)
+        data_processor.store_data(self.pg, data)
         return f"Knowledge base '{file_data.name}' created successfully."
 
     def get_file(self, file_name: str) -> str:

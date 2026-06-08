@@ -2,14 +2,21 @@
 
 import asyncio
 
-from h_rag.db.vector_db_factory import VectorDbFactory
+from h_rag.config.config_wrapper import get_config
+from h_rag.db.pg_vector_wrapper import PgVectorWrapper
+from h_rag.db.postgres_wrapper import PostgresWrapper
 from h_rag.llm.llm_factory import LLMFactory
+from h_rag.models.settings import get_settings
 from h_rag.object_storage.object_storage_factory import ObjectStorageFactory
 from h_rag.tools import initialize_logger
 
 
 class StartupService:
     """Service to check the health of various components in the system."""
+
+    def __init__(self):
+        """Initialize the startup service."""
+        self.postgres_wrapper: PostgresWrapper
 
     async def initalize_environment(self):
         """Initialize logger."""
@@ -29,9 +36,16 @@ class StartupService:
         if not healthy:
             raise RuntimeError("LLM gateway unavailable")
 
-    async def check_vector_db(self):
-        """Check if the vector database is healthy."""
-        vector_db = VectorDbFactory.get_vector_db()
-        healthy = await asyncio.to_thread(vector_db.health_check)
+    async def check_postgres(self):
+        """Check if the Postgres database is healthy."""
+        settings = get_settings()
+        self.postgres_wrapper = PostgresWrapper(
+            db_name=settings.postgres_db,
+            user=settings.postgres_user,
+            password=settings.postgres_password.get_secret_value(),
+            host=get_config("postgres", "host"),
+            port=int(get_config("postgres", "port")),
+        )
+        healthy = await asyncio.to_thread(self.postgres_wrapper.health_check)
         if not healthy:
-            raise RuntimeError("Vector database unavailable")
+            raise RuntimeError("Postgres database unavailable")

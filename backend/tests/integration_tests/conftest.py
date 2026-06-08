@@ -43,6 +43,12 @@ def postgres_wrapper():
     return _factory
 
 
+@pytest.fixture(scope="session")
+def postgres_connection(postgres_wrapper):
+    """Factory fixture to create a PostgresWrapper for any db_name."""
+    return postgres_wrapper("test_postgres_db")
+
+
 @pytest.fixture(autouse=True, scope="session")
 def create_test_db(check_postgres_connection, postgres_wrapper):
     """Fixture to initialize and cleanup the test database."""
@@ -54,9 +60,10 @@ def create_test_db(check_postgres_connection, postgres_wrapper):
             terminate_db_connections(cur, db_name)
             cur.execute(sql.SQL("DROP DATABASE IF EXISTS {}").format(sql.Identifier(db_name)))
             cur.execute(sql.SQL("CREATE DATABASE {}").format(sql.Identifier(db_name)))
+    admin_wrapper.close()
     # Initialize the schema in the new database
     test_wrapper = postgres_wrapper(db_name)
-    with test_wrapper.connect_with_cursor() as (conn, cur):
+    with test_wrapper.get_connection() as (conn, cur):
         cur.execute(_INIT_SQL.read_text())
         conn.commit()
     yield
@@ -67,6 +74,7 @@ def create_test_db(check_postgres_connection, postgres_wrapper):
         with conn.cursor() as cur:
             terminate_db_connections(cur, db_name)
             cur.execute(sql.SQL("DROP DATABASE IF EXISTS {}").format(sql.Identifier(db_name)))
+    admin_wrapper.close()
 
 
 @pytest.fixture(scope="session")
@@ -74,7 +82,7 @@ def check_postgres_connection(postgres_wrapper):
     """Check that a connection can be made to Postgres."""
     admin_wrapper = postgres_wrapper(get_settings().postgres_db)
     try:
-        with admin_wrapper.connect_with_cursor() as (_, cur):
+        with admin_wrapper.get_connection() as (_, cur):
             cur.execute("SELECT 1;")
             assert cur.fetchone() == (1,)
     except Exception as e:

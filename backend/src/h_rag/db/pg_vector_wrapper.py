@@ -2,34 +2,18 @@
 
 import hashlib
 
-from loguru import logger
-
 from h_rag.data_processing.embedding import Embedding
 from h_rag.db.postgres_wrapper import PostgresWrapper
 from h_rag.models.vector_search_result import VectorSearchResult
 
 
-class PgVectorWrapper(PostgresWrapper):
+class PgVectorWrapper:
     """Wrapper for Pg vector database."""
 
-    def __init__(self, db_name: str, user: str, password: str, host: str, port: int):
+    def __init__(self, pg: PostgresWrapper):
         """Initialize the pgvector database wrapper."""
-        PostgresWrapper.__init__(
-            self, db_name=db_name, user=user, password=password, host=host, port=port
-        )
+        self.pg = pg
         self.embedding = Embedding()
-
-    def health_check(self) -> bool:
-        """Check if the vector database is healthy and can be reached."""
-        try:
-            with self.connect_with_cursor() as (_, cur):
-                cur.execute("SELECT 1;")
-                cur.fetchone()
-            logger.info("PgVector health check successful")
-            return True
-        except Exception as e:
-            logger.error(f"PgVector health check failed: {e}")
-            return False
 
     def create(self, name: str) -> None:
         """Create a knowledge base.
@@ -37,7 +21,7 @@ class PgVectorWrapper(PostgresWrapper):
         Args:
             name: The name of the knowledge base to create.
         """
-        with self.connect_with_cursor() as (conn, cur):
+        with self.pg.get_connection() as (conn, cur):
             cur.execute(
                 """
                 INSERT INTO knowledge_base (name)
@@ -54,7 +38,7 @@ class PgVectorWrapper(PostgresWrapper):
         Args:
             name: The name of the knowledge base to delete.
         """
-        with self.connect_with_cursor() as (conn, cur):
+        with self.pg.get_connection() as (conn, cur):
             cur.execute(
                 """
                 DELETE FROM knowledge_base
@@ -83,7 +67,7 @@ class PgVectorWrapper(PostgresWrapper):
         embeddings = [self.embedding.encode(chunk, "document").tolist() for chunk in chunks]
         checksum = hashlib.sha256(doc_name.encode()).digest()
 
-        with self.connect_with_cursor() as (conn, cur):
+        with self.pg.get_connection() as (conn, cur):
             cur.execute("SELECT id FROM knowledge_base WHERE name = %s;", (name,))
             row = cur.fetchone()
             if row is None:
@@ -106,14 +90,14 @@ class PgVectorWrapper(PostgresWrapper):
                 result = cur.fetchone()
             doc_id = result[0]  # pyright: ignore[reportOptionalSubscript]
 
-            # cur.execute(
-            #     """
-            #     INSERT INTO knowledge_base_document (knowledge_base_id, document_id)
-            #     VALUES (%s, %s)
-            #     ON CONFLICT DO NOTHING;
-            #     """,
-            #     (kb_id, doc_id),
-            # )
+            cur.execute(
+                """
+                INSERT INTO knowledge_base_document (knowledge_base_id, document_id)
+                VALUES (%s, %s)
+                ON CONFLICT DO NOTHING;
+                """,
+                (kb_id, doc_id),
+            )
 
             cur.executemany(
                 """
@@ -141,7 +125,7 @@ class PgVectorWrapper(PostgresWrapper):
         # Encode outside the DB transaction to avoid holding the connection open during slow I/O
         query_embedding = self.embedding.encode(query, "query").tolist()
 
-        with self.connect_with_cursor() as (_, cur):
+        with self.pg.get_connection() as (_, cur):
             cur.execute("SELECT id FROM knowledge_base WHERE name = %s;", (name,))
             row = cur.fetchone()
             if row is None:
@@ -173,7 +157,7 @@ class PgVectorWrapper(PostgresWrapper):
         Returns:
             A list of all knowledge bases.
         """
-        with self.connect_with_cursor() as (_, cur):
+        with self.pg.get_connection() as (_, cur):
             cur.execute("SELECT name FROM knowledge_base;")
             results = cur.fetchall()
             return [row[0] for row in results]

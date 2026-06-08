@@ -4,6 +4,7 @@ from typing import override
 
 from h_rag.agents.generator_agent import GeneratorAgent
 from h_rag.agents.retriever_agent import RetrieverAgent
+from h_rag.db.postgres_wrapper import PostgresWrapper
 from h_rag.models.chat_response import ChatResponse
 from h_rag.workflows.workflow import Workflow
 
@@ -11,9 +12,9 @@ from h_rag.workflows.workflow import Workflow
 class DefaultWorkflow(Workflow):
     """Default workflow implementation."""
 
-    def __init__(self, model: str, knowledge_base: str):
+    def __init__(self, pg: PostgresWrapper, model: str, knowledge_base: str):
         """Initialize the DefaultWorkflow."""
-        self.retriever_agent = RetrieverAgent(knowledge_base)
+        self.retriever_agent = RetrieverAgent(pg, knowledge_base)
         self.generator_agent = GeneratorAgent(model)
 
     @override

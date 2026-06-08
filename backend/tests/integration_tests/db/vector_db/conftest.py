@@ -5,14 +5,14 @@ from collections.abc import Generator
 import pytest
 from psycopg import sql
 
-from h_rag.db.pg_vector_wrapper import PgVectorWrapper
+from h_rag.db.postgres_wrapper import PostgresWrapper
 
 
 @pytest.fixture(autouse=True)
-def cleanup_db(wrapper: PgVectorWrapper) -> Generator[None, None, None]:
+def cleanup_db(postgres_connection: PostgresWrapper) -> Generator[None, None, None]:
     """Truncate all public tables after each test to guarantee isolation."""
     yield
-    with wrapper.connect_with_cursor() as (conn, cur):
+    with postgres_connection.get_connection() as (conn, cur):
         cur.execute(
             """
             SELECT table_name

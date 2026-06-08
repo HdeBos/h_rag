@@ -6,7 +6,7 @@ import fitz
 from loguru import logger
 
 from h_rag.data_processing.chunking.chunking_factory import ChunkingFactory
-from h_rag.db.vector_db_factory import VectorDbFactory
+from h_rag.db.pg_vector_wrapper import PgVectorWrapper
 from h_rag.models.document_data import DocumentData
 from h_rag.models.file_data import FileData
 from h_rag.object_storage.object_storage_factory import ObjectStorageFactory
@@ -32,9 +32,9 @@ class DataProcessor:
             chunk_pages=chunk_pages,
         )
 
-    def store_data(self, file_data: DocumentData) -> None:
+    def store_data(self, pg, file_data: DocumentData) -> None:
         """Store processed data in vector database."""
-        vector_db = VectorDbFactory.get_vector_db()
+        vector_db = PgVectorWrapper(pg)
         vector_db.create(file_data.name)
         vector_db.insert(
             name=file_data.name,

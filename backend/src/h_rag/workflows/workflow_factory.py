@@ -13,11 +13,11 @@ class WorkflowFactory:
     }
 
     @classmethod
-    def get_workflow(cls, model: str, knowledge_base: str) -> Workflow:
+    def get_workflow(cls, pg, model: str, knowledge_base: str) -> Workflow:
         """Factory Method."""
         workflow = get_config("run", "workflow")
         try:
-            return cls._workflows[workflow](model, knowledge_base)
+            return cls._workflows[workflow](pg, model, knowledge_base)
         except KeyError:
             raise ValueError(
                 f"Unknown workflow: {workflow}, available workflows: {list(cls._workflows.keys())}"

@@ -4,19 +4,20 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends
 
+from h_rag.api.dependencies import get_chat_service
 from h_rag.models.chat_query import ChatQuery
+from h_rag.models.chat_response import ChatResponse
 from h_rag.services.chat import ChatService
-from src.h_rag.models.chat_response import ChatResponse
 
 router = APIRouter(
     prefix="/chat",
-    tags=["chat"],
+    tags=["Chat"],
 )
 
 
 @router.get("/models")
-def get_models(service: Annotated[ChatService, Depends(ChatService)]) -> list[str]:
-    """Endpoint to get available models.
+def get_models(service: Annotated[ChatService, Depends(get_chat_service)]) -> list[str]:
+    """Get available LLM models.
 
     Args:
         service: The ChatService instance injected by FastAPI.
@@ -27,12 +28,12 @@ def get_models(service: Annotated[ChatService, Depends(ChatService)]) -> list[st
     return service.get_models()
 
 
-@router.post("/query")
+@router.post("/query", status_code=200)
 def query(
-    service: Annotated[ChatService, Depends(ChatService)],
+    service: Annotated[ChatService, Depends(get_chat_service)],
     chat_query: ChatQuery,
 ) -> ChatResponse:
-    """Endpoint to handle chat queries.
+    """Handle a chat query and return a response.
 
     Args:
         service: The ChatService instance injected by FastAPI.

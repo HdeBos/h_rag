@@ -16,8 +16,10 @@ async def lifespan(app: FastAPI):
     await startup_service.initalize_environment()
     await startup_service.check_object_storage()
     await startup_service.check_llm()
-    await startup_service.check_vector_db()
+    await startup_service.check_postgres()
+    app.state.postgres_wrapper = startup_service.postgres_wrapper
     yield
+    startup_service.postgres_wrapper.close()
 
 
 app = FastAPI(title="HRAG API", lifespan=lifespan)

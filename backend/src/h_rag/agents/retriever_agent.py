@@ -2,16 +2,17 @@
 
 from loguru import logger
 
-from h_rag.db.vector_db_factory import VectorDbFactory
+from h_rag.db.pg_vector_wrapper import PgVectorWrapper
+from h_rag.db.postgres_wrapper import PostgresWrapper
 from h_rag.models.vector_search_result import VectorSearchResult
 
 
 class RetrieverAgent:
     """Agent responsible for retrieving relevant information from the vector database."""
 
-    def __init__(self, knowledge_base: str):
+    def __init__(self, pg: PostgresWrapper, knowledge_base: str):
         """Initialize the RetrieverAgent with a vector database instance."""
-        self.vector_db = VectorDbFactory.get_vector_db()
+        self.vector_db = PgVectorWrapper(pg)
         self.knowledge_base = knowledge_base
 
     def retrieve(self, query: str) -> list[VectorSearchResult]:
